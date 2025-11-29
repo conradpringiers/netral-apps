@@ -1,5 +1,6 @@
 # Stop clicking, start writing
 ### 🌐 Netral Apps
+![dd](images/preview/deck.png)
 Netral Apps is a suite of ultra-simple, text-driven productivity tools.
 Write once — generate websites, presentations, and more — all using the same unified Netral Syntax.
 No complex UI.
