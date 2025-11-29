@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Launcher</title>
+        <!-- Chargement de Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            /* Utiliser la police Inter par défaut de Tailwind */
+            body {
+                font-family: "Inter", sans-serif;
+            }
+
+            /* Animation de chargement (load)
+          Fait apparaître les cartes avec un léger rebond.
+        */
+            @keyframes load-pop {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.8) translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+
+            .app-card {
+                /* Appliquer l'animation de chargement */
+                animation: load-pop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+                    forwards;
+                /* Les cartes sont invisibles au début */
+                opacity: 0;
+            }
+
+            /* Ajouter un léger décalage à la deuxième carte pour un effet escalier */
+            .app-card:nth-child(2) {
+                animation-delay: 0.15s;
+            }
+        </style>
+    </head>
+    <!--
+  Changement pour un thème blanc (fond gris très clair)
+-->
+    <body
+        class="bg-gray-100 min-h-screen flex items-center justify-center overflow-hidden"
+    >
+        <!--
+      Conteneur principal pour la gallerie
+      Centré, avec un espacement entre les éléments
+    -->
+        <main class="flex flex-wrap justify-center gap-6 sm:gap-8 p-6">
+            <!-- ===== App 1: Deck ===== -->
+            <a
+                href="https://netraldeck.netlify.app/editor"
+                aria-label="Lancer Deck"
+                class="app-card group relative overflow-hidden <!-- Ajout: relative et overflow-hidden --> flex flex-col items-start justify-start <!-- Changé: alignement en haut à gauche --> w-44 h-52 p-5 <!-- Changé: taille plus petite (w-44 h-52) et padding --> bg-white rounded-3xl shadow-lg <!-- Changé: fond blanc --> cursor-pointer transition-all duration-200 ease-in-out <!-- Changé: duration-200 pour plus de réactivité --> hover:shadow-xl hover:scale-105 <!-- Gardé: effet sur toute la carte --> active:scale-90 active:opacity-75"
+            >
+                <!-- Changé: suppression de shadow-inner pour un clic plus net -->
+
+                <!--
+              Icône pour Deck (plus petite)
+              Placeholder avec couleurs adaptées
+            -->
+                <img
+                    src="images/logos/deck.png"
+                    alt="Deck Icon"
+                    class="w-16 h-16 rounded-xl mb-3 <!-- Changé: w-16 h-16, rounded-xl --> transition-transform duration-300 group-hover:scale-110"
+                />
+
+                <!-- Titre -->
+                <span class="text-xl font-semibold text-gray-900">Deck</span>
+                <!-- Changé: text-xl, couleur -->
+
+                <!-- Nouvelle mini-description -->
+                <p class="text-sm text-gray-500 mt-1">Presentations</p>
+
+                <!--
+              Barre de survol supprimée
+            -->
+            </a>
+
+            <!-- ===== App 2: Block ===== -->
+            <a
+                href="https://netralblock.netlify.app"
+                aria-label="Lancer Block"
+                class="app-card group relative overflow-hidden flex flex-col items-start justify-start w-44 h-52 p-5 bg-white rounded-3xl shadow-lg cursor-pointer transition-all duration-200 ease-in-out <!-- Changé: duration-200 pour plus de réactivité --> hover:shadow-xl hover:scale-105 <!-- Gardé: effet sur toute la carte --> active:scale-90 active:opacity-75"
+            >
+                <!-- Changé: suppression de shadow-inner pour un clic plus net -->
+
+                <!--
+              Icône pour Block (plus petite)
+              Placeholder avec couleurs adaptées
+            -->
+                <img
+                    src="images/logos/block.png"
+                    alt="Block Icon"
+                    class="w-16 h-16 rounded-xl mb-3 transition-transform duration-300 group-hover:scale-110"
+                />
+
+                <!-- Titre -->
+                <span class="text-xl font-semibold text-gray-900">Block</span>
+                <!-- Changé: text-xl, couleur -->
+
+                <!-- Nouvelle mini-description -->
+                <p class="text-sm text-gray-500 mt-1">Website builder</p>
+
+                <!--
+              Barre de survol supprimée
+            -->
+            </a>
+        </main>
+    </body>
+</html>

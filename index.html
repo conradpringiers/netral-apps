@@ -1,0 +1,1010 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>/* presentationstyles.css — Netral Block (complete)
+   - Full styles for preview/export
+   - Navbar with blurred "relief" hover and left-to-right animated underline
+   - Hover animations for cards, buttons, features, etc.
+   - Header types: classic (bg image), bigtext (text left/image right), splitimage
+   - Components: Bigtitle, Column, Element, Card, Feature, Testimonial, Pricing
+   - Themes: Modern, Natural, Latte, Dark Mode, Terminal, Ocean, Solarized, Midnight, Minimal
+   - Responsive adjustments included
+*/
+
+/* -------------------------
+   Fonts (Google) - kept as import
+   ------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@300;400;700&family=Roboto+Mono:wght@400;700&display=swap");
+
+:root {
+    --max-width: 1100px;
+    --pad: 20px;
+    --radius: 14px;
+    --transition-fast: 200ms;
+    --transition-medium: 320ms;
+    --warn-bg: #fff0d4;
+    --def-bg: #e5f7ff;
+    --def-border: #99d2e6;
+    --quote-bg: #f5f5f5;
+    --quote-border: #ddd;
+    --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.06);
+    --glass: rgba(255, 255, 255, 0.6);
+    --glass-dark: rgba(0, 0, 0, 0.35);
+    --muted: #6b7280;
+}
+
+/* -------------------------
+   Basic reset & helpers
+   ------------------------- */
+* {
+    box-sizing: border-box;
+}
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+body {
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial;
+    color: var(--page-text, #111);
+    background: var(--page-bg, #fff);
+    line-height: 1.5;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--pad);
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+.flex {
+    display: flex;
+}
+.col {
+    display: flex;
+    flex-direction: column;
+}
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* -------------------------
+   NAVBAR — modern, blurred background, left logo, links centered, animated underline
+   ------------------------- */
+.netral-navbar {
+    position: sticky;
+    top: 18px;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition:
+        background var(--transition-medium),
+        box-shadow var(--transition-medium),
+        transform var(--transition-medium);
+}
+.netral-navbar .nav-wrap {
+    width: 100%;
+    max-width: var(--max-width);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0.75)
+    );
+    box-shadow: var(--shadow-soft);
+}
+
+/* left logo zone */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.site-logo {
+    height: 36px;
+    width: auto;
+    border-radius: 8px;
+    display: block;
+}
+.site-logo-text {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.2px;
+}
+
+/* links zone */
+.nav-links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    position: relative;
+    padding: 6px 10px;
+}
+.nav-links a {
+    position: relative;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: inherit;
+    display: inline-block;
+    transition:
+        transform var(--transition-fast),
+        color var(--transition-fast);
+    will-change: transform;
+    z-index: 2;
+}
+
+/* Hover "relief" card behind link (pseudo element per link for local glow) */
+.nav-links a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    left: -6px;
+    right: -6px;
+    top: -6px;
+    bottom: -6px;
+    border-radius: 14px;
+    background: transparent;
+    transition:
+        background var(--transition-medium),
+        box-shadow var(--transition-medium),
+        transform var(--transition-medium);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* animated underline element (sliding from left) implemented per link ::after */
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    bottom: -6px;
+    height: 3px;
+    width: 0%;
+    background: currentColor;
+    border-radius: 3px;
+    transition:
+        width 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
+        left 320ms cubic-bezier(0.2, 0.9, 0.2, 1);
+    z-index: 3;
+}
+
+/* on hover: show blurred/raised background and expand underline from left */
+.nav-links a:hover {
+    transform: translateY(-4px);
+    color: inherit;
+}
+.nav-links a:hover::before {
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+    transform: translateY(4px);
+}
+.nav-links a:hover::after {
+    left: 8px;
+    width: calc(100% - 16px);
+}
+
+/* Focus accessibility */
+.nav-links a:focus {
+    outline: 2px solid rgba(0, 0, 0, 0.08);
+    outline-offset: 6px;
+}
+
+/* dark navbar for dark themes */
+.theme-darkmode .netral-navbar .nav-wrap,
+.theme-terminal .netral-navbar .nav-wrap,
+.theme-midnight .netral-navbar .nav-wrap {
+    background: linear-gradient(
+        180deg,
+        rgba(8, 8, 8, 0.65),
+        rgba(8, 8, 8, 0.45)
+    );
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+.theme-darkmode .nav-links a::before,
+.theme-terminal .nav-links a::before,
+.theme-midnight .nav-links a::before {
+    background: transparent;
+}
+.theme-darkmode .nav-links a:hover::before,
+.theme-terminal .nav-links a:hover::before,
+.theme-midnight .nav-links a:hover::before {
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow:
+        inset 0 0 18px rgba(255, 255, 255, 0.02),
+        0 10px 30px rgba(0, 0, 0, 0.6);
+}
+.theme-darkmode .nav-links a::after,
+.theme-terminal .nav-links a::after,
+.theme-midnight .nav-links a::after {
+    background: #fff;
+}
+.theme-darkmode .nav-links a,
+.theme-terminal .nav-links a,
+.theme-midnight .nav-links a {
+    color: #eaeaea;
+}
+
+/* -------------------------
+   HEADER (classic / bigtext / splitimage)
+   ------------------------- */
+.netral-header {
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+}
+.netral-header .header-inner {
+    position: relative;
+    z-index: 2;
+}
+.netral-header.classic {
+    min-height: 56vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.netral-header.classic .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.32),
+        rgba(0, 0, 0, 0.55)
+    );
+}
+.netral-header.classic h1 {
+    color: #fff;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin: 0;
+}
+.netral-header.classic p {
+    color: rgba(255, 255, 255, 0.92);
+    margin-top: 8px;
+}
+
+/* BigText: left text (big), right image (not background) */
+.netral-header.bigtext {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    padding: 48px 0;
+}
+.netral-header.bigtext .header-left {
+    flex: 1;
+    padding-left: var(--pad);
+}
+.netral-header.bigtext .header-left h1 {
+    font-size: 2.6rem;
+    margin: 0 0 12px 0;
+    line-height: 1.02;
+}
+.netral-header.bigtext .header-left p {
+    margin: 0 0 14px;
+    color: rgba(0, 0, 0, 0.75);
+}
+.netral-header.bigtext .header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: var(--pad);
+}
+.netral-header.bigtext .header-right img {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 16px;
+    box-shadow: 0 18px 50px rgba(2, 6, 23, 0.08);
+}
+
+/* SplitImage: half image, half text on neutral bg */
+.netral-header.splitimage {
+    display: flex;
+    min-height: 56vh;
+}
+.netral-header.splitimage .split-left,
+.netral-header.splitimage .split-right {
+    flex: 1;
+}
+.netral-header.splitimage .split-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.netral-header.splitimage .split-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+}
+.netral-header.splitimage .split-right h1 {
+    font-size: 2.2rem;
+    margin: 0 0 10px;
+}
+
+/* header CTA (no heavy hover) */
+.header-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: none;
+}
+
+/* -------------------------
+   SECTIONS / CONTENT
+   ------------------------- */
+.netral-section {
+    padding: 64px 0;
+}
+.netral-section .container {
+    display: block;
+}
+.netral-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+/* paragraphs & lists */
+.section-content p {
+    margin: 0 0 14px;
+}
+.section-content ul {
+    margin: 10px 0 16px 20px;
+}
+.section-content blockquote {
+    border-left: 4px solid rgba(0, 0, 0, 0.08);
+    padding-left: 12px;
+    color: rgba(0, 0, 0, 0.7);
+    font-style: italic;
+}
+
+/* -------------------------
+   COMPONENTS: IMAGE, BUTTON, CARD
+   ------------------------- */
+.netral-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+}
+
+/* CALLOUTS */
+.warning-box,
+.definition-box,
+.quote-box {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.warning-box {
+    background-color: var(--warn-bg);
+    border: 2px solid var(--warn-border);
+    color: #b37400;
+}
+.definition-box {
+    background-color: var(--def-bg);
+    border: 2px solid var(--def-border);
+    color: #00796b;
+    padding-left: 60px; /* Espace pour l'icône */
+}
+.definition-box::before {
+    content: "💡";
+    font-size: 2.5em;
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    opacity: 0.7;
+}
+
+.quote-box {
+    background-color: var(--quote-bg);
+    border-left: 4px solid var(--accent-color);
+    padding: 15px 20px;
+    margin-top: 20px;
+    font-style: italic;
+}
+/* Button - subtle hover lift */
+.netral-button {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+.netral-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.12);
+}
+
+/* Card - moderate hover lift */
+.netral-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card-bg, #fff);
+    box-shadow: var(--shadow-soft);
+    transition:
+        transform var(--transition-medium),
+        box-shadow var(--transition-medium);
+}
+.netral-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(2, 6, 23, 0.12);
+}
+.netral-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.netral-card .card-content {
+    padding: 16px;
+}
+.netral-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+}
+.netral-card p {
+    margin: 0;
+    color: var(--muted);
+}
+
+/* card button */
+.card-btn {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    transition: transform var(--transition-fast);
+}
+.card-btn:hover {
+    transform: translateY(-3px);
+}
+
+/* -------------------------
+   ELEMENTS (small grid)
+   ------------------------- */
+.netral-elements {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 18px;
+}
+.netral-element {
+    width: 220px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--element-bg, #fff);
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-medium);
+}
+.netral-element:hover {
+    transform: translateY(-8px);
+}
+.netral-element img {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+.netral-element h4 {
+    margin: 6px 0;
+    font-size: 1rem;
+}
+.netral-element p {
+    margin: 0;
+    color: var(--muted);
+}
+
+/* -------------------------
+   BIGTITLE
+   ------------------------- */
+.netral-bigtitle {
+    text-align: center;
+    padding: 48px 20px;
+}
+.netral-bigtitle h1 {
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    line-height: 1;
+    margin: 0;
+}
+
+/* -------------------------
+   COLUMN layout
+   ------------------------- */
+.netral-column {
+    display: flex;
+    gap: 28px;
+    margin: 28px 0;
+    align-items: flex-start;
+}
+.netral-column .col-left,
+.netral-column .col-right {
+    float: left;
+    width: 50%;
+}
+@media (max-width: 880px) {
+    .netral-column {
+        flex-direction: column;
+    }
+}
+
+/* -------------------------
+   FEATURES grid
+   ------------------------- */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 16px;
+}
+.feature {
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    transition: transform var(--transition-medium);
+}
+.feature:hover {
+    transform: translateY(-8px);
+}
+.feature .f-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+/* -------------------------
+  Banner
+  -------------------------- *
+  /* Conteneur principal: max-w-2xl mx-auto my-10 p-6 bg-white rounded-lg shadow-lg */
+.banner {
+    width: 100%;
+    background-color: #efefef;
+    border-radius: 10px;
+}
+
+/* Grille Responsive (2 colonnes sur tablette/desktop, 1 colonne sur mobile) */
+.banner .content-grid {
+    display: flex;
+    grid-template-columns: 50% 50%;
+    gap: 10px; /* Écart de 6 */
+    align-items: center;
+}
+
+/* Styles du titre et du texte */
+.banner .main-title {
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    line-height: 1;
+    margin: 0;
+    color: #595959;
+}
+.banner .description-text {
+    color: #4b5563; /* gray-600 */
+}
+
+.text-area {
+    width: 100%;
+    margin-bottom: 0; /* Annule mb-4 du mobile */
+}
+
+/* Styles de l'image */
+.visual-image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.375rem; /* rounded-md */
+    object-fit: cover;
+}
+/* -------------------------
+   TESTIMONIALS
+   ------------------------- */
+.testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+.testimonial {
+    display: flex;
+    margin-top: 16px;
+    gap: 12px;
+    background: var(--card-bg, #fff);
+    padding: 12px;
+    border-radius: 12px;
+    align-items: flex-start;
+    box-shadow: var(--shadow-soft);
+}
+.t-photo img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.t-body .quote {
+    margin: 0 0 8px;
+    font-style: italic;
+}
+.t-body .who {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+/* -------------------------
+   PRICING
+   ------------------------- */
+.pricings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+.pricing {
+    background: var(--card-bg, #fff);
+    padding: 20px;
+    margin-top: 16px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-medium);
+}
+.pricing:hover {
+    transform: translateY(-8px);
+}
+.pricing .price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 10px 0;
+}
+.pricing .perks {
+    list-style: disc;
+    margin-left: 18px;
+    text-align: left;
+}
+.pricing .buy {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* -------------------------
+   responsive tweaks
+   ------------------------- */
+@media (max-width: 920px) {
+    .nav-wrap {
+        padding: 10px;
+    }
+    .nav-links {
+        gap: 10px;
+    }
+    .netral-column {
+        gap: 18px;
+    }
+    .netral-header.bigtext {
+        flex-direction: column;
+        padding: 28px 0;
+    }
+    .netral-header.bigtext .header-right img {
+        max-width: 360px;
+    }
+}
+@media (max-width: 520px) {
+    .site-logo {
+        height: 30px;
+    }
+    .nav-links a {
+        padding: 6px 8px;
+        font-size: 0.95rem;
+    }
+    .netral-card,
+    .feature,
+    .pricing {
+        padding: 14px;
+    }
+}
+
+/* -------------------------
+   THEMES (modern + extras)
+   ------------------------- */
+
+/* default page variables (overridden by theme classes) */
+.netral-site {
+    --page-bg: #ffffff;
+    --page-text: #111;
+    --card-bg: #ffffff;
+    --element-bg: #ffffff;
+}
+
+/* Modern */
+.theme-modern.netral-site {
+    --page-bg: #ffffff;
+    --page-text: #111;
+    --card-bg: #ffffff;
+    --element-bg: #ffffff;
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system;
+}
+
+/* Natural */
+.theme-natural.netral-site {
+    --page-bg: linear-gradient(180deg, #f6fbf6, #eef7ee);
+    --page-text: #12321b;
+    --card-bg: #ffffff;
+    --element-bg: #eef6ec;
+    font-family: Merriweather, serif;
+}
+
+/* Latte */
+.theme-latte.netral-site {
+    --page-bg: linear-gradient(180deg, #fff9f4, #fbf3ef);
+    --page-text: #3b2f2f;
+    --card-bg: #fff8f2;
+    --element-bg: #fff6f0;
+    font-family: Georgia, serif;
+}
+
+/* Dark Mode */
+.theme-darkmode.netral-site {
+    --page-bg: linear-gradient(180deg, #060607, #0b0b0b);
+    --page-text: #e9eef1;
+    --card-bg: #0f1113;
+    --element-bg: #0b0d0e;
+    font-family:
+        Roboto Mono,
+        monospace;
+}
+
+/* Terminal */
+.theme-terminal.netral-site {
+    --page-bg: #000;
+    --page-text: #00ff5a;
+    --card-bg: #050505;
+    --element-bg: #070707;
+    font-family:
+        Roboto Mono,
+        monospace;
+}
+
+/* Ocean */
+.theme-ocean.netral-site {
+    --page-bg: linear-gradient(180deg, #e6f7ff, #d7f0ff);
+    --page-text: #023047;
+    --card-bg: #ffffff;
+    --element-bg: #f0fbff;
+}
+
+/* Solarized */
+.theme-solarized.netral-site {
+    --page-bg: #fdf6e3;
+    --page-text: #073642;
+    --card-bg: #fffaf0;
+    --element-bg: #faf7ec;
+    font-family: Merriweather, serif;
+}
+
+/* Midnight */
+.theme-midnight.netral-site {
+    --page-bg: linear-gradient(180deg, #07070d, #0f1724);
+    --page-text: #e6e8ff;
+    --card-bg: #0f1724;
+    --element-bg: #0b1220;
+}
+
+/* Minimal */
+.theme-minimal.netral-site {
+    --page-bg: #fafafa;
+    --page-text: #111;
+    --card-bg: #fff;
+    --element-bg: #fff;
+}
+
+/* Apply theme variables */
+.theme-modern.netral-site,
+.theme-natural.netral-site,
+.theme-latte.netral-site,
+.theme-darkmode.netral-site,
+.theme-terminal.netral-site,
+.theme-ocean.netral-site,
+.theme-solarized.netral-site,
+.theme-midnight.netral-site,
+.theme-minimal.netral-site {
+    background: var(--page-bg);
+    color: var(--page-text);
+}
+.theme-modern.netral-site .netral-card,
+.theme-natural.netral-site .netral-card,
+.theme-latte.netral-site .netral-card,
+.theme-ocean.netral-site .netral-card,
+.theme-solarized.netral-site .netral-card,
+.theme-minimal.netral-site .netral-card {
+    background: var(--card-bg);
+}
+.theme-darkmode.netral-site .netral-card,
+.theme-terminal.netral-site .netral-card,
+.theme-midnight.netral-site .netral-card {
+    background: var(--card-bg);
+    color: var(--page-text);
+}
+.theme-modern.netral-site .netral-element,
+.theme-natural.netral-site .netral-element,
+.theme-latte.netral-site .netral-element,
+.theme-ocean.netral-site .netral-element,
+.theme-solarized.netral-site .netral-element,
+.theme-minimal.netral-site .netral-element {
+    background: var(--element-bg);
+}
+.theme-darkmode.netral-site .netral-element,
+.theme-terminal.netral-site .netral-element,
+.theme-midnight.netral-site .netral-element {
+    background: var(--element-bg);
+    color: var(--page-text);
+}
+
+/* Ensure navbar text color for dark themes */
+.theme-darkmode .nav-links a,
+.theme-terminal .nav-links a,
+.theme-midnight .nav-links a {
+    color: #eaeaea;
+}
+
+/* -------------------------
+   small utilities
+   ------------------------- */
+.hidden {
+    display: none;
+}
+.mt-6 {
+    margin-top: 1.5rem;
+}
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+</style><script>
+window.TallyConfig = {
+  "formId": "31aGPp",
+  "popup": {
+    "emoji": {
+      "text": "👋",
+      "animation": "wave"
+    }
+  }
+};
+</script>
+
+<script async src="https://tally.so/widgets/embed.js"></script></script>
+</head><body><div class="netral-site theme-modern"><nav class="netral-navbar"><div class="nav-wrap"><div class="nav-links"><a href="#tools">Tools</a>
+<a href="https://discord.gg/gPa76Zx7AK">Discord</a>
+<a href="go.html">Launch Netral -&gt;</a></div></div></nav><header class="netral-header bigtext"><div class="container header-inner"><div class="header-left"><h1>Stop Clicking, Start Writing</h1><p>Netral is a unified suite of productivity tools (presentation/website tool, etc.) that all work with the same syntax, allowing you to do everything much faster after just 5 minutes of learning.</p><p><a class="header-btn" href="Link" target="_blank" rel="noopener">Découvrir</a></p></div><div class="header-right"></div></div></header><main><section id="speed" class="netral-section"><div class="container"><h2>Speed</h2><div class="netral-bigtitle container"><h1>Meet the Netral Syntax</h1></div>
+<p>Netraldeck works with only a text editor, so you need to learn a simple syntax called "Netral Syntax". In addition to being easy to use, it is universal to all Netral tools (like Netral Block).</p>
+<div class="netral-image container"><img src="images/preview/deck.png" alt=""></div></div></section>
+<section id="why" class="netral-section"><div class="container"><h2>Why ?</h2><div class="features container"><div class="feature"><div class="f-icon">📁</div><h4>Elements</h4><p>Despite its simplicity, Netral Deck is designed for optimal readability and comprehension. Every piece of syntax produces a powerful visual structure.</p></div>
+<div class="feature"><div class="f-icon">🎨</div><h4>Themes</h4><p>Netraldeck allows you to customise your entire layout with themes that vary colour, elements, and fonts with a single command. This works on almost every Netral Tool...</p></div></div></div></section>
+<section id="tools" class="netral-section"><div class="container"><h2>Tools</h2><div class="netral-bigtitle container"><h1>There is a tool for Everyting</h1></div>
+<h3>Netral...</h3>
+<title>Netral - Stop clicking, Start writing</title>
+<p>    <section class="banner"></p>
+<p>            <!-- Conteneur principal: Utilise maintenant la classe 'content-grid' --></p>
+<p>            <div class="content-grid"></p>
+<p>                <!-- Contenu Texte (Gauche) --></p>
+<p>                <div class="text-area mb-4"></p>
+<p>                    <!-- Grand Titre --></p>
+<p>                    <div class="main-title"><h1>Deck</h1></div></p>
+<p>                    <!-- Description --></p>
+<p>                    <p class="description-text"></p>
+<p>                    Netral Deck is the tool that combines the speed of a text editor with the power of a visual presentation.</p>
+<p>                    </p></p>
+<p>                </div></p>
+<p>                <!-- Image (Droite) --></p>
+<p>                <div></p>
+<p>                    <!-- Image de placeholder --></p>
+<p>                    <img src="images/mock/deck.png" alt="Image" class="visual-image"></p>
+<p>                </div></p>
+<p>            </div></p>
+<p>        </section></p>
+<p>    </p>
+
+<p>    <section class="banner"></p>
+<p>            <!-- Conteneur principal: Utilise maintenant la classe 'content-grid' --></p>
+<p>            <div class="content-grid"></p>
+<p>                <!-- Contenu Texte (Gauche) --></p>
+<p>                <div class="text-area mb-4"></p>
+<p>                    <!-- Grand Titre --></p>
+<p>                    <div class="main-title"><h1>Block</h1></div></p>
+<p>                    <!-- Description --></p>
+<p>                    <p class="description-text"></p>
+<p>                    Creating websites has never been easier. everything has already been done to ensure your website is perfect.</p>
+<p>                    </p></p>
+<p>                </div></p>
+<p>                <!-- Image (Droite) --></p>
+<p>                <div></p>
+<p>                    <!-- Image de placeholder --></p>
+<p>                    <img src="images/mock/block.png" alt="Image" class="visual-image"></p>
+<p>                </div></p>
+<p>            </div></p>
+<p>        </section></p>
+<p>    </p>
+
+<p>    <section class="banner"></p>
+<p>            <!-- Conteneur principal: Utilise maintenant la classe 'content-grid' --></p>
+<p>            <div class="content-grid"></p>
+<p>                <!-- Contenu Texte (Gauche) --></p>
+<p>                <div class="text-area mb-4"></p>
+<p>                    <!-- Grand Titre --></p>
+<p>                    <div class="main-title"><h1>More to Come...</h1></div></p>
+<p>                    <!-- Description --></p>
+<p>                    <p class="description-text"></p>
+<p>                    </p>
+<p>                    </p></p>
+<p>                </div></p>
+<p>                <!-- Image (Droite) --></p>
+<p>                <div></p>
+<p>
+<p>                </div></p>
+<p>            </div></p>
+<p>        </section></p>
+<p>    </p></div></section>
+<section id="accessibility" class="netral-section"><div class="container"><h2>Accessibility</h2><div class="netral-bigtitle container"><h1>Works everywhere, for everyone</h1></div>
+<div class="features container"><div class="feature"><div class="f-icon">📚 Education</div><h4>Structuring Ideas for Better Learning.</h4><p>Netral Deck is not just fast, its pedagogically sound. By forcing structural thinking through text-based input, students learn to organize their arguments clearly.
+<p>✓ <strong>Enhanced Retention</strong>: Studies show that textual structuring improves information retention and speech clarity.</p>
+<p>✓ <strong>Clarity First</strong>: It discourages reliance on flashy visuals, pushing the focus back to the substance of the presentation.</p></div></p>
+<div class="feature"><div class="f-icon">💻 Conveniency</div><h4>Works on everything</h4><p>✓ Universal Compatibility
+<p>✓ Online &amp; Native</p>
+<p>✓ Zero Friction</p></div></div></p></div></section>
+<section id="pricing" class="netral-section"><div class="container"><h2>Pricing</h2><div class="netral-bigtitle container"><h1>Price ?</h1></div>
+<div class="pricings container"><div class="pricing"><h3>For Everyone</h3><div class="price">Free</div><ul class="perks"><ul><li>Netral is free for everyone !</li></ul></ul></div></div></div></section>
+<section id="join-the-team-or-support-me" class="netral-section"><div class="container"><h2>Join the team or support me</h2><p>Netral's tools are and always will be free. However, it's true that it's difficult to develop this project without help. You are therefore welcome to lend your support by helping with the code, making a small donation, or simply showing your support!</p>
+<div class="pricings container"><div class="pricing"><h3>Quick tip</h3><div class="price">Support me</div><a class="buy" href="https://buymeacoffee.com/conradprinr">Choisir</a></div>
+<div class="pricing"><h3>Join the squad</h3><div class="price">Join our discord</div><a class="buy" href="https://discord.gg/gPa76Zx7AK">Choisir</a></div></div></div></section>
+<section id="end-of-page-w" class="netral-section"><div class="container"><h2>End of page (^w^)</h2></div></section></main></div></body></html>
