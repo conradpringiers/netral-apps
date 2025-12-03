@@ -1,13 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+/**
+ * Index Page
+ * Entry point for Netral Apps - currently loads Netral Block
+ */
+
+import { BlockApp } from '@/apps/block/BlockApp';
+import { Helmet } from 'react-helmet-async';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Helmet>
+        <title>Netral Block - Éditeur Markdown Moderne</title>
+        <meta name="description" content="Netral Block est un éditeur Markdown moderne avec des extensions personnalisées pour créer des documents riches et interactifs." />
+      </Helmet>
+      <BlockApp />
+    </>
   );
 };
 
