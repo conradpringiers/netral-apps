@@ -120,7 +120,7 @@ const netralTheme = EditorView.theme({
     backgroundColor: 'hsl(220 9% 46%)',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: 'transparent',
+    backgroundColor: 'hsl(220 9% 46%)',
   },
   '&.cm-focused': {
     outline: 'none',
