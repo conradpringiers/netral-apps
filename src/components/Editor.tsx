@@ -140,9 +140,10 @@ const netralTheme = EditorView.theme({
   },
   '.cm-tooltip-autocomplete ul li': {
     padding: '6px 12px',
+    
   },
   '.cm-tooltip-autocomplete ul li[aria-selected]': {
-    backgroundColor: 'hsl(var(--accent))',
+    backgroundColor: 'hsl(220 9% 46%)',
   },
 });
 
