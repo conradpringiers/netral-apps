@@ -3,24 +3,13 @@
  * Retractable formatting toolbar at the bottom of the editor
  */
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Bold,
   Italic,
-  Heading1,
-  Heading2,
-  List,
-  ListOrdered,
   Link,
   Image,
-  Quote,
-  Code,
-  AlertTriangle,
-  Info,
   Columns,
-  LayoutGrid,
-  Video,
-  Globe,
   ChevronUp,
   ChevronDown,
 } from 'lucide-react';
@@ -40,142 +29,38 @@ interface ToolbarButton {
   icon: React.ReactNode;
   label: string;
   action: () => void;
-  group: 'format' | 'structure' | 'media' | 'blocks';
 }
 
 export function FloatingToolbar({ onInsert, onWrap }: FloatingToolbarProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const buttons: ToolbarButton[] = [
-    // Format group
     {
       icon: <Bold className="w-4 h-4" />,
-      label: 'Gras',
+      label: 'Bold (Ctrl+B)',
       action: () => onWrap('**', '**'),
-      group: 'format',
     },
     {
       icon: <Italic className="w-4 h-4" />,
-      label: 'Italique',
+      label: 'Italic (Ctrl+I)',
       action: () => onWrap('*', '*'),
-      group: 'format',
     },
     {
-      icon: <Heading1 className="w-4 h-4" />,
-      label: 'Titre 1',
-      action: () => onInsert('\n# '),
-      group: 'format',
+      icon: <Link className="w-4 h-4" />,
+      label: 'Link',
+      action: () => onWrap('[', '](https://url)'),
     },
-    {
-      icon: <Heading2 className="w-4 h-4" />,
-      label: 'Titre 2',
-      action: () => onInsert('\n## '),
-      group: 'format',
-    },
-    {
-      icon: <List className="w-4 h-4" />,
-      label: 'Liste',
-      action: () => onInsert('\n- '),
-      group: 'format',
-    },
-    {
-      icon: <ListOrdered className="w-4 h-4" />,
-      label: 'Liste numérotée',
-      action: () => onInsert('\n1. '),
-      group: 'format',
-    },
-    {
-      icon: <Code className="w-4 h-4" />,
-      label: 'Code',
-      action: () => onWrap('`', '`'),
-      group: 'format',
-    },
-    // Structure group
-    {
-      icon: <Columns className="w-4 h-4" />,
-      label: 'Colonnes',
-      action: () => onInsert('\nColumn[\n{Contenu gauche}\n{Contenu droite}\n]\n'),
-      group: 'structure',
-    },
-    {
-      icon: <LayoutGrid className="w-4 h-4" />,
-      label: 'Feature',
-      action: () => onInsert('\nFeature[\n{🚀;Titre;Description}\n{⚡;Titre;Description}\n]\n'),
-      group: 'structure',
-    },
-    // Media group
     {
       icon: <Image className="w-4 h-4" />,
       label: 'Image',
       action: () => onInsert('\nImage[https://example.com/image.jpg]\n'),
-      group: 'media',
     },
     {
-      icon: <Video className="w-4 h-4" />,
-      label: 'Vidéo',
-      action: () => onInsert('\nVideo[https://example.com/video.mp4]\n'),
-      group: 'media',
-    },
-    {
-      icon: <Globe className="w-4 h-4" />,
-      label: 'Embed',
-      action: () => onInsert('\nEmbed[https://example.com]\n'),
-      group: 'media',
-    },
-    {
-      icon: <Link className="w-4 h-4" />,
-      label: 'Element',
-      action: () => onInsert('\nElement[\n{Titre;Description;https://image.url}\n]\n'),
-      group: 'media',
-    },
-    // Blocks group
-    {
-      icon: <AlertTriangle className="w-4 h-4" />,
-      label: 'Warning',
-      action: () => onInsert('\nWarn[Texte d\'avertissement]\n'),
-      group: 'blocks',
-    },
-    {
-      icon: <Info className="w-4 h-4" />,
-      label: 'Info',
-      action: () => onInsert('\nDef[Texte informatif]\n'),
-      group: 'blocks',
-    },
-    {
-      icon: <Quote className="w-4 h-4" />,
-      label: 'Citation',
-      action: () => onInsert('\nquote[Citation inspirante]\n'),
-      group: 'blocks',
+      icon: <Columns className="w-4 h-4" />,
+      label: 'Columns',
+      action: () => onInsert('\nColumn[\n{Left content}\n{Right content}\n]\n'),
     },
   ];
-
-  const groupedButtons = {
-    format: buttons.filter(b => b.group === 'format'),
-    structure: buttons.filter(b => b.group === 'structure'),
-    media: buttons.filter(b => b.group === 'media'),
-    blocks: buttons.filter(b => b.group === 'blocks'),
-  };
-
-  const renderGroup = (group: ToolbarButton[], label: string) => (
-    <div className="flex items-center gap-1">
-      <span className="text-xs text-muted-foreground mr-1 hidden sm:inline">{label}</span>
-      {group.map((button, index) => (
-        <Tooltip key={index}>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={button.action}
-              className="h-8 w-8 hover:bg-accent"
-            >
-              {button.icon}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">{button.label}</TooltipContent>
-        </Tooltip>
-      ))}
-    </div>
-  );
 
   return (
     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
@@ -188,26 +73,42 @@ export function FloatingToolbar({ onInsert, onWrap }: FloatingToolbarProps) {
           {isExpanded ? (
             <>
               <ChevronDown className="w-3 h-3" />
-              Masquer
+              Hide
             </>
           ) : (
             <>
               <ChevronUp className="w-3 h-3" />
-              Formatage
+              Format
             </>
           )}
         </button>
 
         {/* Toolbar content */}
         {isExpanded && (
-          <div className="px-3 pb-3 pt-1 flex flex-wrap items-center gap-2 justify-center">
-            {renderGroup(groupedButtons.format, 'Format')}
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            {renderGroup(groupedButtons.structure, 'Structure')}
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            {renderGroup(groupedButtons.media, 'Média')}
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            {renderGroup(groupedButtons.blocks, 'Blocs')}
+          <div className="px-3 pb-3 pt-1 flex items-center gap-1 justify-center">
+            {buttons.map((button, index) => (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      button.action();
+                    }}
+                    className="h-8 w-8 hover:bg-accent"
+                    type="button"
+                  >
+                    {button.icon}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">{button.label}</TooltipContent>
+              </Tooltip>
+            ))}
+            <span className="text-xs text-muted-foreground ml-2">
+              Type element name + Tab
+            </span>
           </div>
         )}
       </div>
