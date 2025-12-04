@@ -3,14 +3,16 @@
  * Main application component for the Netral editor
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Editor, getEditorMethods } from '@/components/Editor';
 import { NetralRenderer } from '@/core/renderer/NetralRenderer';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
+import { HelpModal } from '@/shared/components/HelpModal';
+import { FileMenu } from '@/shared/components/FileMenu';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { downloadHtml } from '@/core/exporter/htmlExporter';
 import { toast } from '@/hooks/use-toast';
-import { Layers, Download, Eye, Code2, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Layers, Download, Eye, Code2, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   ResizablePanelGroup,
@@ -18,73 +20,81 @@ import {
   ResizableHandle,
 } from '@/components/ui/resizable';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
 // Default content to showcase the new syntax
-const DEFAULT_CONTENT = `--- Mon Site Netral
+const DEFAULT_CONTENT = `--- My Netral Site
 Theme[Modern]
 Logo[Netral]
 Navbar[
-{Accueil;#home}
-{Fonctionnalités;#features}
-{Tarifs;#pricing}
+{Home;#home}
+{Features;#features}
+{Pricing;#pricing}
 {Contact;#contact}
 ]
-Header[BigText;Créez des sites web avec une syntaxe simple;Netral vous permet de construire des pages web magnifiques en utilisant une syntaxe intuitive, sans code complexe.;https://picsum.photos/1200/600;#features]
+Header[BigText;Create websites with simple syntax;Netral lets you build beautiful web pages using intuitive syntax, no complex code required.;https://picsum.photos/1200/600;#features]
 
--- Fonctionnalités
-Bigtitle[Tout ce dont vous avez besoin]
+-- Features
+Bigtitle[Everything you need]
 
 Feature[
-{🚀;Rapide;Créez des pages en quelques minutes avec notre syntaxe intuitive}
-{🎨;Thèmes;9 thèmes professionnels prêts à l'emploi}
-{📱;Responsive;Toutes les pages sont automatiquement adaptées aux mobiles}
+{🚀;Fast;Create pages in minutes with our intuitive syntax}
+{🎨;Themes;9 professional themes ready to use}
+{📱;Responsive;All pages automatically adapt to mobile}
 ]
 
-Def[Netral utilise une syntaxe inspirée du Markdown mais étendue pour le web moderne.]
+Stats[
+{100+;Users}
+{50K;Pages Created}
+{99%;Satisfaction}
+]
 
--- Contenu riche
+Def[Netral uses a Markdown-inspired syntax extended for the modern web.]
 
-Vous pouvez écrire du **texte en gras**, *en italique*, et même créer des listes :
+-- Rich Content
 
-- Premier élément
-- Deuxième élément
-- Troisième élément
+You can write **bold text**, *italic*, and even create lists:
+
+- First item
+- Second item
+- Third item
 
 Column[
-{La colonne de gauche peut contenir du texte explicatif sur votre produit ou service.}
-{La colonne de droite peut présenter des informations complémentaires ou des détails importants.}
+{The left column can contain explanatory text about your product or service.}
+{The right column can present complementary information or important details.}
 ]
 
 Image[https://picsum.photos/800/400]
 
--- Témoignages
+-- Testimonials
 
 Testimonial[
-{Marie Dupont;CEO de TechCorp;Netral a transformé notre façon de créer du contenu web;https://i.pravatar.cc/100?img=1}
-{Jean Martin;Designer;Une interface intuitive qui booste ma productivité;https://i.pravatar.cc/100?img=2}
+{Marie Dupont;CEO at TechCorp;Netral transformed how we create web content;https://i.pravatar.cc/100?img=1}
+{John Martin;Designer;An intuitive interface that boosts my productivity;https://i.pravatar.cc/100?img=2}
 ]
 
-Warn[Cette syntaxe est encore en développement. De nouvelles fonctionnalités arrivent bientôt !]
+FAQ[
+{What is Netral?;Netral is a simple syntax for creating beautiful websites without coding.}
+{How do I get started?;Just start typing in the editor - use element names + Tab to insert templates.}
+{Can I export my site?;Yes! Click the Export button to download a standalone HTML file.}
+]
 
--- Tarifs
+CTA[Ready to get started?;Join thousands of users creating beautiful websites;Get Started Free;#signup]
+
+Warn[This syntax is still in development. New features coming soon!]
+
+-- Pricing
 
 Pricing[
-{Gratuit;0€/mois;Usage personnel, 1 projet, Support communauté}
-{Pro;19€/mois;Usage commercial, Projets illimités, Support prioritaire}
-{Entreprise;99€/mois;Multi-utilisateurs, API access, Support dédié}
+{Free;$0/mo;Personal use, 1 project, Community support}
+{Pro;$19/mo;Commercial use, Unlimited projects, Priority support}
+{Enterprise;$99/mo;Multi-users, API access, Dedicated support}
 ]
 
-quote[La simplicité est la sophistication suprême. - Léonard de Vinci]
+quote[Simplicity is the ultimate sophistication. - Leonardo da Vinci]
 `;
 
 export function BlockApp() {
@@ -93,6 +103,12 @@ export function BlockApp() {
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
   const charCount = getCharCount(content);
+  
+  // Extract document title from content
+  const documentTitle = useMemo(() => {
+    const match = content.match(/^---\s*(.+)$/m);
+    return match ? match[1].trim() : '';
+  }, [content]);
 
   // Editor action handlers
   const handleInsert = useCallback((text: string) => {
@@ -110,11 +126,15 @@ export function BlockApp() {
   }, []);
 
   const handleExport = () => {
-    downloadHtml(content, 'netral-site.html');
+    downloadHtml(content, `${documentTitle || 'netral-site'}.html`);
     toast({
-      title: 'Export réussi',
-      description: 'Le fichier HTML a été téléchargé.',
+      title: 'Export successful',
+      description: 'The HTML file has been downloaded.',
     });
+  };
+  
+  const handleLoadFile = (newContent: string) => {
+    setContent(newContent);
   };
 
   // Keyboard shortcuts
@@ -129,6 +149,10 @@ export function BlockApp() {
           case 'i':
             e.preventDefault();
             handleWrap('*', '*');
+            break;
+          case 's':
+            e.preventDefault();
+            handleExport();
             break;
         }
       }
@@ -145,10 +169,20 @@ export function BlockApp() {
         <div className="flex items-center gap-3">
           <Layers className="h-5 w-5 text-primary" />
           <span className="font-semibold text-foreground">Netral Block</span>
-          <span className="text-xs text-muted-foreground">{charCount} caractères</span>
+          <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">
+            {charCount} chars
+          </span>
+          <FileMenu 
+            documentTitle={documentTitle} 
+            content={content} 
+            onLoad={handleLoadFile}
+          />
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Help */}
+          <HelpModal />
+          
           {/* View mode toggle */}
           <div className="flex items-center bg-muted rounded-md p-0.5">
             <Tooltip>
@@ -162,7 +196,7 @@ export function BlockApp() {
                   <Code2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Éditeur seul</TooltipContent>
+              <TooltipContent>Editor only</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -176,7 +210,7 @@ export function BlockApp() {
                   <PanelLeft className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Vue divisée</TooltipContent>
+              <TooltipContent>Split view</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -190,7 +224,7 @@ export function BlockApp() {
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Aperçu seul</TooltipContent>
+              <TooltipContent>Preview only</TooltipContent>
             </Tooltip>
           </div>
 
@@ -214,7 +248,7 @@ export function BlockApp() {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="h-full overflow-auto bg-background">
+              <div className="h-full overflow-auto">
                 <NetralRenderer content={content} />
               </div>
             </ResizablePanel>
@@ -225,7 +259,7 @@ export function BlockApp() {
             <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} />
           </div>
         ) : (
-          <div className="h-full overflow-auto bg-background">
+          <div className="h-full overflow-auto">
             <NetralRenderer content={content} />
           </div>
         )}

@@ -46,7 +46,12 @@ export type ContentBlock =
   | { type: 'def'; text: string }
   | { type: 'quote'; text: string }
   | { type: 'embed'; url: string }
-  | { type: 'video'; url: string };
+  | { type: 'video'; url: string }
+  | { type: 'stats'; items: StatItem[] }
+  | { type: 'cta'; title: string; description: string; buttonText: string; buttonUrl: string }
+  | { type: 'faq'; items: FAQItem[] }
+  | { type: 'divider'; style: string }
+  | { type: 'gallery'; items: GalleryItem[] };
 
 export interface ElementItem {
   title: string;
@@ -71,6 +76,21 @@ export interface PricingItem {
   title: string;
   price: string;
   benefits: string[];
+}
+
+export interface StatItem {
+  value: string;
+  label: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface GalleryItem {
+  url: string;
+  caption: string;
 }
 
 /**
@@ -238,6 +258,31 @@ export function parseNetralDocument(input: string): NetralDocument {
         continue;
       }
 
+      // Divider[style]
+      const dividerMatch = trimmed.match(/^Divider\[([^\]]+)\]/i);
+      if (dividerMatch) {
+        flushMarkdown();
+        currentSection.content.push({ type: 'divider', style: dividerMatch[1].trim() });
+        i++;
+        continue;
+      }
+
+      // CTA[title;description;buttonText;buttonUrl]
+      const ctaMatch = trimmed.match(/^CTA\[([^\]]+)\]/i);
+      if (ctaMatch) {
+        flushMarkdown();
+        const parts = ctaMatch[1].split(';').map(s => s.trim());
+        currentSection.content.push({
+          type: 'cta',
+          title: parts[0] || '',
+          description: parts[1] || '',
+          buttonText: parts[2] || 'Learn More',
+          buttonUrl: parts[3] || '#',
+        });
+        i++;
+        continue;
+      }
+
       // Element[...]
       if (trimmed.startsWith('Element[')) {
         flushMarkdown();
@@ -280,6 +325,33 @@ export function parseNetralDocument(input: string): NetralDocument {
         flushMarkdown();
         const { content, endIndex } = extractBracketContent(lines, i);
         currentSection.content.push({ type: 'pricing', items: parsePricingItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // Stats[...]
+      if (trimmed.startsWith('Stats[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'stats', items: parseStatItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // FAQ[...]
+      if (trimmed.startsWith('FAQ[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'faq', items: parseFAQItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // Gallery[...]
+      if (trimmed.startsWith('Gallery[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'gallery', items: parseGalleryItems(content) });
         i = endIndex + 1;
         continue;
       }
@@ -456,6 +528,60 @@ function parsePricingItems(content: string): PricingItem[] {
       title: match[1].trim(),
       price: match[2].trim(),
       benefits: match[3].split(',').map(b => b.trim()).filter(Boolean),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse stat items: {Value;Label}
+ */
+function parseStatItems(content: string): StatItem[] {
+  const items: StatItem[] = [];
+  const regex = /\{([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      value: match[1].trim(),
+      label: match[2].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse FAQ items: {Question;Answer}
+ */
+function parseFAQItems(content: string): FAQItem[] {
+  const items: FAQItem[] = [];
+  const regex = /\{([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      question: match[1].trim(),
+      answer: match[2].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse gallery items: {URL;Caption}
+ */
+function parseGalleryItems(content: string): GalleryItem[] {
+  const items: GalleryItem[] = [];
+  const regex = /\{([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      url: match[1].trim(),
+      caption: match[2].trim(),
     });
   }
   
