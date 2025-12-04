@@ -108,7 +108,7 @@ const netralTheme = EditorView.theme({
     wordBreak: 'break-word',
   },
   '.cm-gutters': {
-    backgroundColor: 'transparent',
+    backgroundColor: 'hsl(220 9% 46%)',
     borderRight: '1px solid hsl(220 13% 91%)',
     color: 'hsl(220 9% 46%)',
   },
