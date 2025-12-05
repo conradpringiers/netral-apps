@@ -1,12 +1,12 @@
 /**
  * Content Block Renderer
- * Renders various content block types
+ * Renders various content block types with responsive centered layouts
  */
 
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { ContentBlock } from '@/core/parser/netralParser';
-import { AlertTriangle, Info, CheckCircle, Quote, ChevronDown } from 'lucide-react';
+import { AlertTriangle, Info, CheckCircle, Quote, ChevronDown, Star, ArrowRight, Clock, Users, MapPin, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 interface ContentBlockRendererProps {
@@ -19,14 +19,14 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
       const html = DOMPurify.sanitize(marked.parse(block.content) as string);
       return (
         <div
-          className="prose-content mb-6"
+          className="prose-content mb-6 max-w-3xl mx-auto"
           dangerouslySetInnerHTML={{ __html: html }}
         />
       );
 
     case 'image':
       return (
-        <figure className="my-8">
+        <figure className="my-8 max-w-4xl mx-auto">
           <img
             src={block.url}
             alt="Content image"
@@ -39,7 +39,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
     case 'bigtitle':
       return (
         <h2 
-          className="text-4xl md:text-5xl font-bold text-center my-12"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold text-center my-12 px-4"
           style={{ color: 'hsl(var(--foreground))' }}
         >
           {block.text}
@@ -48,11 +48,11 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'element':
       return (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+        <div className="flex flex-wrap justify-center gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="card-hover rounded-xl overflow-hidden shadow-md border"
+              className="card-hover rounded-xl overflow-hidden shadow-md border w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
               style={{ 
                 backgroundColor: 'hsl(var(--card))',
                 borderColor: 'hsl(var(--border))'
@@ -84,7 +84,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'column':
       return (
-        <div className="grid md:grid-cols-2 gap-8 my-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-8 max-w-4xl mx-auto">
           <div className="prose-content" style={{ color: 'hsl(var(--foreground))' }}>
             {block.left}
           </div>
@@ -96,11 +96,11 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'feature':
       return (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+        <div className="flex flex-wrap justify-center gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="card-hover p-6 rounded-xl border"
+              className="card-hover p-6 rounded-xl border w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
               style={{ 
                 backgroundColor: 'hsl(var(--card))',
                 borderColor: 'hsl(var(--border))'
@@ -123,16 +123,21 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'testimonial':
       return (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+        <div className="flex flex-wrap justify-center gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="card-hover p-6 rounded-xl border"
+              className="card-hover p-6 rounded-xl border w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
               style={{ 
                 backgroundColor: 'hsl(var(--card))',
                 borderColor: 'hsl(var(--border))'
               }}
             >
+              <div className="flex gap-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-current" style={{ color: 'hsl(var(--warning))' }} />
+                ))}
+              </div>
               <p 
                 className="italic mb-4"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
@@ -144,7 +149,8 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
                   <img
                     src={item.photo}
                     alt={item.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-primary"
+                    className="w-12 h-12 rounded-full object-cover ring-2"
+                    style={{ ringColor: 'hsl(var(--primary))' }}
                   />
                 )}
                 <div>
@@ -169,11 +175,11 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'pricing':
       return (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+        <div className="flex flex-wrap justify-center gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="card-hover p-6 rounded-xl border text-center"
+              className="card-hover p-6 rounded-xl border text-center w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
               style={{ 
                 backgroundColor: 'hsl(var(--card))',
                 borderColor: 'hsl(var(--border))'
@@ -210,21 +216,21 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'stats':
       return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-8">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="text-center p-6 rounded-xl"
+              className="text-center p-4 sm:p-6 rounded-xl w-[calc(50%-8px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] max-w-xs card-hover"
               style={{ backgroundColor: 'hsl(var(--secondary))' }}
             >
               <p 
-                className="text-4xl md:text-5xl font-bold mb-2"
+                className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2"
                 style={{ color: 'hsl(var(--primary))' }}
               >
                 {item.value}
               </p>
               <p 
-                className="text-sm font-medium"
+                className="text-xs sm:text-sm font-medium"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 {item.label}
@@ -237,33 +243,34 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
     case 'cta':
       return (
         <div 
-          className="my-12 p-8 md:p-12 rounded-2xl text-center"
+          className="my-12 p-6 sm:p-8 md:p-12 rounded-2xl text-center max-w-4xl mx-auto"
           style={{ backgroundColor: 'hsl(var(--secondary))' }}
         >
           <h3 
-            className="text-2xl md:text-3xl font-bold mb-4"
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4"
             style={{ color: 'hsl(var(--secondary-foreground))' }}
           >
             {block.title}
           </h3>
           <p 
-            className="mb-6 max-w-2xl mx-auto"
+            className="mb-6 max-w-2xl mx-auto text-sm sm:text-base"
             style={{ color: 'hsl(var(--muted-foreground))' }}
           >
             {block.description}
           </p>
           <a
             href={block.buttonUrl}
-            className="btn-primary inline-flex items-center px-8 py-4 rounded-lg font-medium"
+            className="btn-primary inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium"
           >
             {block.buttonText}
+            <ArrowRight className="w-4 h-4" />
           </a>
         </div>
       );
 
     case 'faq':
       return (
-        <div className="my-8 space-y-4">
+        <div className="my-8 space-y-4 max-w-3xl mx-auto">
           {block.items.map((item, index) => (
             <FAQItem key={index} question={item.question} answer={item.answer} />
           ))}
@@ -284,14 +291,14 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
         );
       }
       return (
-        <hr className="my-12 border-t" style={{ borderColor: 'hsl(var(--border))' }} />
+        <hr className="my-12 border-t max-w-4xl mx-auto" style={{ borderColor: 'hsl(var(--border))' }} />
       );
 
     case 'gallery':
       return (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 my-8">
+        <div className="flex flex-wrap justify-center gap-4 my-8">
           {block.items.map((item, index) => (
-            <figure key={index} className="group relative overflow-hidden rounded-xl">
+            <figure key={index} className="group relative overflow-hidden rounded-xl w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] max-w-xs">
               <img
                 src={item.url}
                 alt={item.caption}
@@ -310,10 +317,97 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
         </div>
       );
 
+    // NEW ELEMENTS
+    case 'timeline':
+      return (
+        <div className="my-8 max-w-3xl mx-auto">
+          <div className="relative">
+            <div 
+              className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-0.5 transform sm:-translate-x-1/2"
+              style={{ backgroundColor: 'hsl(var(--border))' }}
+            />
+            {block.items.map((item, index) => (
+              <div 
+                key={index} 
+                className={`relative flex items-start gap-4 mb-8 ${index % 2 === 0 ? 'sm:flex-row-reverse' : ''}`}
+              >
+                <div className={`flex-1 ${index % 2 === 0 ? 'sm:text-right' : ''} pl-12 sm:pl-0`}>
+                  <div 
+                    className="card-hover p-4 rounded-xl border inline-block max-w-md"
+                    style={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                  >
+                    <div className="flex items-center gap-2 mb-2" style={{ color: 'hsl(var(--primary))' }}>
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm font-medium">{item.date}</span>
+                    </div>
+                    <h4 className="font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>{item.title}</h4>
+                    <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{item.description}</p>
+                  </div>
+                </div>
+                <div 
+                  className="absolute left-4 sm:left-1/2 w-3 h-3 rounded-full transform -translate-x-1/2 mt-6 ring-4"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--primary))',
+                    ringColor: 'hsl(var(--background))'
+                  }}
+                />
+                <div className="flex-1 hidden sm:block" />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'team':
+      return (
+        <div className="flex flex-wrap justify-center gap-6 my-8">
+          {block.items.map((item, index) => (
+            <div
+              key={index}
+              className="card-hover text-center p-6 rounded-xl border w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] max-w-xs"
+              style={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+            >
+              {item.photo && (
+                <img
+                  src={item.photo}
+                  alt={item.name}
+                  className="w-24 h-24 rounded-full object-cover mx-auto mb-4 ring-4"
+                  style={{ ringColor: 'hsl(var(--primary) / 0.2)' }}
+                />
+              )}
+              <h4 className="font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>{item.name}</h4>
+              <p className="text-sm mb-2" style={{ color: 'hsl(var(--primary))' }}>{item.role}</p>
+              {item.bio && (
+                <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{item.bio}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+
+    case 'countdown':
+      return (
+        <div 
+          className="my-8 p-6 sm:p-8 rounded-2xl text-center max-w-2xl mx-auto"
+          style={{ backgroundColor: 'hsl(var(--secondary))' }}
+        >
+          <div className="flex items-center justify-center gap-2 mb-4" style={{ color: 'hsl(var(--primary))' }}>
+            <Clock className="w-5 h-5" />
+            <span className="text-sm font-medium uppercase tracking-wider">{block.label}</span>
+          </div>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: 'hsl(var(--foreground))' }}>
+            {block.date}
+          </p>
+          {block.description && (
+            <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{block.description}</p>
+          )}
+        </div>
+      );
+
     case 'warn':
       return (
         <div 
-          className="flex items-start gap-3 p-4 rounded-lg my-4 border"
+          className="flex items-start gap-3 p-4 rounded-lg my-4 border max-w-3xl mx-auto"
           style={{ 
             backgroundColor: 'hsl(var(--warning) / 0.1)',
             borderColor: 'hsl(var(--warning))'
@@ -327,7 +421,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
     case 'def':
       return (
         <div 
-          className="flex items-start gap-3 p-4 rounded-lg my-4 border"
+          className="flex items-start gap-3 p-4 rounded-lg my-4 border max-w-3xl mx-auto"
           style={{ 
             backgroundColor: 'hsl(var(--info) / 0.1)',
             borderColor: 'hsl(var(--info))'
@@ -341,7 +435,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
     case 'quote':
       return (
         <blockquote 
-          className="flex items-start gap-3 p-6 my-6 border-l-4 rounded-r-lg"
+          className="flex items-start gap-3 p-6 my-6 border-l-4 rounded-r-lg max-w-3xl mx-auto"
           style={{ 
             backgroundColor: 'hsl(var(--muted))',
             borderColor: 'hsl(var(--primary))'
@@ -354,7 +448,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'embed':
       return (
-        <div className="my-8 rounded-xl overflow-hidden border" style={{ borderColor: 'hsl(var(--border))' }}>
+        <div className="my-8 rounded-xl overflow-hidden border max-w-4xl mx-auto" style={{ borderColor: 'hsl(var(--border))' }}>
           <iframe
             src={block.url}
             className="w-full h-96"
@@ -366,7 +460,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
 
     case 'video':
       return (
-        <div className="my-8">
+        <div className="my-8 max-w-4xl mx-auto">
           <video
             src={block.url}
             controls
