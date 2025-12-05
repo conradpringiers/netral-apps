@@ -1,14 +1,14 @@
 /**
  * Netral Renderer
- * Main component that renders a complete Netral document
+ * Main component that renders a complete Netral document with modern floating navbar
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { parseNetralDocument, NetralDocument } from '@/core/parser/netralParser';
 import { getTheme, generateThemeCSS } from '@/core/themes/themes';
 import { HeaderRenderer } from './components/HeaderRenderer';
 import { ContentBlockRenderer } from './components/ContentBlockRenderer';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 interface NetralRendererProps {
   content: string;
@@ -16,6 +16,8 @@ interface NetralRendererProps {
 }
 
 export function NetralRenderer({ content, className = '' }: NetralRendererProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const document = useMemo(() => {
     try {
       return parseNetralDocument(content);
@@ -89,78 +91,155 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
           box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.5);
         }
         
+        /* Modern floating navbar */
+        .netral-render .floating-nav {
+          position: fixed;
+          top: 1rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 100;
+          padding: 0.75rem 1.5rem;
+          border-radius: 9999px;
+          background: hsl(var(--background) / 0.8);
+          backdrop-filter: blur(16px);
+          border: 1px solid hsl(var(--border) / 0.5);
+          box-shadow: 0 8px 32px -8px hsl(var(--foreground) / 0.1);
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+          max-width: calc(100% - 2rem);
+        }
+        
         /* Navbar link effects */
         .netral-render .nav-link {
           position: relative;
+          padding: 0.5rem 0;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: hsl(var(--muted-foreground));
           transition: color 0.2s ease;
+          white-space: nowrap;
         }
-        .netral-render .nav-link::after {
+        .netral-render .nav-link::before {
           content: '';
           position: absolute;
-          bottom: -4px;
-          left: 0;
+          bottom: 0;
+          left: 50%;
           width: 0;
           height: 2px;
-          background: hsl(var(--primary));
-          transition: width 0.3s ease;
+          background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.5));
+          border-radius: 2px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform: translateX(-50%);
         }
-        .netral-render .nav-link:hover::after {
+        .netral-render .nav-link:hover::before {
           width: 100%;
         }
         .netral-render .nav-link:hover {
+          color: hsl(var(--foreground));
+        }
+        
+        /* Mobile menu */
+        .netral-render .mobile-menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 99;
+          background: hsl(var(--background) / 0.98);
+          backdrop-filter: blur(16px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2rem;
+        }
+        .netral-render .mobile-menu a {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: hsl(var(--foreground));
+          transition: color 0.2s;
+        }
+        .netral-render .mobile-menu a:hover {
           color: hsl(var(--primary));
         }
       `}</style>
 
-      {/* Navbar */}
+      {/* Modern Floating Navbar */}
       {(document.logo || document.navbar.length > 0) && (
-        <nav className="sticky top-0 z-50 backdrop-blur-md border-b" style={{ 
-          backgroundColor: 'hsl(var(--background) / 0.9)',
-          borderColor: 'hsl(var(--border))'
-        }}>
-          <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <>
+          <nav className="floating-nav">
             <div className="flex items-center gap-2">
               {document.logo && (
                 document.logo.type === 'url' ? (
                   <img src={document.logo.value} alt="Logo" className="h-8 w-auto" />
                 ) : (
-                  <span className="text-xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>{document.logo.value}</span>
+                  <span className="text-lg font-bold" style={{ color: 'hsl(var(--foreground))' }}>{document.logo.value}</span>
                 )
               )}
             </div>
             
             {document.navbar.length > 0 && (
               <>
-                <div className="hidden md:flex items-center gap-8">
+                <div className="hidden md:flex items-center gap-6">
                   {document.navbar.map((item, index) => (
                     <a
                       key={index}
                       href={item.url}
-                      className="nav-link text-sm font-medium"
-                      style={{ color: 'hsl(var(--muted-foreground))' }}
+                      className="nav-link"
                     >
                       {item.label}
                     </a>
                   ))}
                 </div>
-                <button className="md:hidden p-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  <Menu className="w-5 h-5" />
+                <button 
+                  className="md:hidden p-2 rounded-full transition-colors"
+                  style={{ color: 'hsl(var(--muted-foreground))' }}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </>
             )}
-          </div>
-        </nav>
+          </nav>
+
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div className="mobile-menu">
+              <button 
+                className="absolute top-4 right-4 p-2"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: 'hsl(var(--foreground))' }}
+              >
+                <X className="w-6 h-6" />
+              </button>
+              {document.navbar.map((item, index) => (
+                <a
+                  key={index}
+                  href={item.url}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {/* Spacer for fixed navbar */}
+          <div className="h-20" />
+        </>
       )}
 
       {/* Header */}
       {document.header && <HeaderRenderer header={document.header} />}
 
       {/* Sections */}
-      <main className="max-w-5xl mx-auto px-6 py-12">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
         {document.sections.map((section, sectionIndex) => (
           <section key={sectionIndex} className="mb-16">
             {section.title && (
-              <h2 className="text-3xl font-bold mb-8 pb-2 border-b" style={{ 
+              <h2 className="text-2xl sm:text-3xl font-bold mb-8 pb-2 border-b text-center sm:text-left" style={{ 
                 color: 'hsl(var(--foreground))',
                 borderColor: 'hsl(var(--border))'
               }}>
