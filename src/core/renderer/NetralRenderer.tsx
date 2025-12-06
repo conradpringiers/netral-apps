@@ -91,12 +91,10 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
           box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.5);
         }
         
-        /* Modern floating navbar */
+        /* Modern floating navbar - sticky instead of fixed to stay within preview */
         .netral-render .floating-nav {
-          position: fixed;
+          position: sticky;
           top: 1rem;
-          left: 50%;
-          transform: translateX(-50%);
           z-index: 100;
           padding: 0.75rem 1.5rem;
           border-radius: 9999px;
@@ -106,8 +104,10 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
           box-shadow: 0 8px 32px -8px hsl(var(--foreground) / 0.1);
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 2rem;
-          max-width: calc(100% - 2rem);
+          max-width: fit-content;
+          margin: 1rem auto 0;
         }
         
         /* Navbar link effects */
@@ -139,7 +139,7 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
           color: hsl(var(--foreground));
         }
         
-        /* Mobile menu */
+        /* Mobile menu - positioned within the render container */
         .netral-render .mobile-menu {
           position: fixed;
           top: 0;
@@ -226,8 +226,7 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
             </div>
           )}
 
-          {/* Spacer for fixed navbar */}
-          <div className="h-20" />
+          {/* No spacer needed with sticky positioning */}
         </>
       )}
 

@@ -145,12 +145,11 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
                 "{item.text}"
               </p>
               <div className="flex items-center gap-3">
-                {item.photo && (
+              {item.photo && (
                   <img
                     src={item.photo}
                     alt={item.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2"
-                    style={{ ringColor: 'hsl(var(--primary))' }}
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/30"
                   />
                 )}
                 <div>
@@ -345,11 +344,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
                   </div>
                 </div>
                 <div 
-                  className="absolute left-4 sm:left-1/2 w-3 h-3 rounded-full transform -translate-x-1/2 mt-6 ring-4"
-                  style={{ 
-                    backgroundColor: 'hsl(var(--primary))',
-                    ringColor: 'hsl(var(--background))'
-                  }}
+                  className="absolute left-4 sm:left-1/2 w-3 h-3 rounded-full transform -translate-x-1/2 mt-6 ring-4 ring-background bg-primary"
                 />
                 <div className="flex-1 hidden sm:block" />
               </div>
@@ -371,8 +366,7 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
                 <img
                   src={item.photo}
                   alt={item.name}
-                  className="w-24 h-24 rounded-full object-cover mx-auto mb-4 ring-4"
-                  style={{ ringColor: 'hsl(var(--primary) / 0.2)' }}
+                  className="w-24 h-24 rounded-full object-cover mx-auto mb-4 ring-4 ring-primary/20"
                 />
               )}
               <h4 className="font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>{item.name}</h4>
