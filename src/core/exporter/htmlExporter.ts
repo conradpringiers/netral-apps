@@ -6,6 +6,7 @@
 import { parseNetralDocument } from '../parser/netralParser';
 import { getTheme, generateThemeCSS } from '../themes/themes';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 /**
  * Generate a complete HTML document from Netral syntax
@@ -15,17 +16,17 @@ export function exportToHtml(content: string, title: string = 'Netral Document')
   const theme = getTheme(doc.theme);
   const themeCSS = generateThemeCSS(theme);
 
-  // Generate navbar HTML
+  // Generate navbar HTML - no spacer needed with sticky positioning
   const navbarHtml = doc.navbar.length > 0 || doc.logo ? `
     <nav class="floating-nav">
       <div class="nav-logo">
         ${doc.logo ? (doc.logo.type === 'url' 
           ? `<img src="${doc.logo.value}" alt="Logo" />` 
-          : `<span>${doc.logo.value}</span>`) 
+          : `<span>${escapeHtml(doc.logo.value)}</span>`) 
         : ''}
       </div>
       <div class="nav-links">
-        ${doc.navbar.map(item => `<a href="${item.url}" class="nav-link">${item.label}</a>`).join('')}
+        ${doc.navbar.map(item => `<a href="${escapeHtml(item.url)}" class="nav-link">${escapeHtml(item.label)}</a>`).join('')}
       </div>
       <button class="mobile-toggle" onclick="document.body.classList.toggle('menu-open')">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -36,9 +37,8 @@ export function exportToHtml(content: string, title: string = 'Netral Document')
       </button>
     </nav>
     <div class="mobile-menu">
-      ${doc.navbar.map(item => `<a href="${item.url}" onclick="document.body.classList.remove('menu-open')">${item.label}</a>`).join('')}
+      ${doc.navbar.map(item => `<a href="${escapeHtml(item.url)}" onclick="document.body.classList.remove('menu-open')">${escapeHtml(item.label)}</a>`).join('')}
     </div>
-    <div class="nav-spacer"></div>
   ` : '';
 
   // Generate header HTML
@@ -74,12 +74,10 @@ export function exportToHtml(content: string, title: string = 'Netral Document')
       line-height: 1.6;
     }
     
-    /* Modern Floating Navbar */
+    /* Modern Floating Navbar - same as preview */
     .floating-nav {
-      position: fixed;
+      position: sticky;
       top: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
       z-index: 100;
       padding: 0.75rem 1.5rem;
       border-radius: 9999px;
@@ -89,8 +87,10 @@ export function exportToHtml(content: string, title: string = 'Netral Document')
       box-shadow: 0 8px 32px -8px hsla(var(--foreground), 0.1);
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 2rem;
-      max-width: calc(100% - 2rem);
+      max-width: fit-content;
+      margin: 1rem auto 0;
     }
     
     .nav-logo img { height: 2rem; width: auto; }
@@ -123,7 +123,6 @@ export function exportToHtml(content: string, title: string = 'Netral Document')
     
     .mobile-toggle { display: none; background: none; border: none; color: hsl(var(--muted-foreground)); cursor: pointer; padding: 0.5rem; }
     .mobile-menu { display: none; }
-    .nav-spacer { height: 5rem; }
     
     @media (max-width: 768px) {
       .nav-links { display: none; }
@@ -615,7 +614,8 @@ function generateHeaderHtml(header: any): string {
 function generateBlockHtml(block: any): string {
   switch (block.type) {
     case 'markdown':
-      return `<div class="prose">${marked.parse(block.content)}</div>`;
+      const sanitizedMarkdown = DOMPurify.sanitize(marked.parse(block.content) as string);
+      return `<div class="prose">${sanitizedMarkdown}</div>`;
     
     case 'image':
       return `<img src="${block.url}" alt="Content image" class="image" loading="lazy" />`;
@@ -641,8 +641,8 @@ function generateBlockHtml(block: any): string {
     case 'column':
       return `
         <div class="columns">
-          <div class="prose">${block.left}</div>
-          <div class="prose">${block.right}</div>
+          <div class="prose">${escapeHtml(block.left)}</div>
+          <div class="prose">${escapeHtml(block.right)}</div>
         </div>
       `;
     

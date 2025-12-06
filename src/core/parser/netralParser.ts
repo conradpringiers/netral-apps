@@ -51,7 +51,10 @@ export type ContentBlock =
   | { type: 'cta'; title: string; description: string; buttonText: string; buttonUrl: string }
   | { type: 'faq'; items: FAQItem[] }
   | { type: 'divider'; style: string }
-  | { type: 'gallery'; items: GalleryItem[] };
+  | { type: 'gallery'; items: GalleryItem[] }
+  | { type: 'timeline'; items: TimelineItem[] }
+  | { type: 'team'; items: TeamMember[] }
+  | { type: 'countdown'; label: string; date: string; description: string };
 
 export interface ElementItem {
   title: string;
@@ -91,6 +94,19 @@ export interface FAQItem {
 export interface GalleryItem {
   url: string;
   caption: string;
+}
+
+export interface TimelineItem {
+  date: string;
+  title: string;
+  description: string;
+}
+
+export interface TeamMember {
+  name: string;
+  role: string;
+  photo: string;
+  bio: string;
 }
 
 /**
@@ -356,6 +372,39 @@ export function parseNetralDocument(input: string): NetralDocument {
         continue;
       }
 
+      // Timeline[...]
+      if (trimmed.startsWith('Timeline[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'timeline', items: parseTimelineItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // Team[...]
+      if (trimmed.startsWith('Team[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'team', items: parseTeamItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // Countdown[label;date;description]
+      const countdownMatch = trimmed.match(/^Countdown\[([^\]]+)\]/i);
+      if (countdownMatch) {
+        flushMarkdown();
+        const parts = countdownMatch[1].split(';').map(s => s.trim());
+        currentSection.content.push({
+          type: 'countdown',
+          label: parts[0] || '',
+          date: parts[1] || '',
+          description: parts[2] || '',
+        });
+        i++;
+        continue;
+      }
+
       // Regular markdown content
       markdownBuffer += line + '\n';
     }
@@ -582,6 +631,45 @@ function parseGalleryItems(content: string): GalleryItem[] {
     items.push({
       url: match[1].trim(),
       caption: match[2].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse timeline items: {Date;Title;Description}
+ */
+function parseTimelineItems(content: string): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  const regex = /\{([^;]*);([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      date: match[1].trim(),
+      title: match[2].trim(),
+      description: match[3].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse team items: {Name;Role;Photo;Bio}
+ */
+function parseTeamItems(content: string): TeamMember[] {
+  const items: TeamMember[] = [];
+  const regex = /\{([^;]*);([^;]*);([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      name: match[1].trim(),
+      role: match[2].trim(),
+      photo: match[3].trim(),
+      bio: match[4].trim(),
     });
   }
   
