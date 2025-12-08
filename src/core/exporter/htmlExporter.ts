@@ -304,7 +304,7 @@ function escapeHtml(str: string): string {
 /**
  * Download a file with the given content
  */
-export function downloadHtmlFile(content: string, filename: string): void {
+export function downloadHtml(content: string, filename: string): void {
   const html = exportToHtml(content, filename.replace('.html', ''));
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
@@ -317,4 +317,18 @@ export function downloadHtmlFile(content: string, filename: string): void {
   document.body.removeChild(link);
   
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Copy HTML to clipboard
+ */
+export async function copyHtmlToClipboard(content: string): Promise<boolean> {
+  try {
+    const html = exportToHtml(content, 'Netral Document');
+    await navigator.clipboard.writeText(html);
+    return true;
+  } catch (error) {
+    console.error('Failed to copy to clipboard:', error);
+    return false;
+  }
 }
