@@ -250,8 +250,8 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="relative h-full border-r border-border" ref={editorContainerRef}>
-                <Editor value={content} onChange={setContent} />
-                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} />
+                <Editor value={content} onChange={setContent} mode="block" />
+                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="block" />
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
@@ -263,8 +263,8 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
           </ResizablePanelGroup>
         ) : viewMode === 'editor' ? (
           <div className="relative h-full" ref={editorContainerRef}>
-            <Editor value={content} onChange={setContent} />
-            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} />
+            <Editor value={content} onChange={setContent} mode="block" />
+            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="block" />
           </div>
         ) : (
           <div className="h-full overflow-auto">

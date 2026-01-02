@@ -314,7 +314,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="relative h-full border-r border-border" ref={editorContainerRef}>
-                <Editor value={content} onChange={setContent} />
+                <Editor value={content} onChange={setContent} mode="deck" />
                 <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
               </div>
             </ResizablePanel>
@@ -327,7 +327,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
           </ResizablePanelGroup>
         ) : viewMode === 'editor' ? (
           <div className="relative h-full" ref={editorContainerRef}>
-            <Editor value={content} onChange={setContent} />
+            <Editor value={content} onChange={setContent} mode="deck" />
             <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
           </div>
         ) : (
