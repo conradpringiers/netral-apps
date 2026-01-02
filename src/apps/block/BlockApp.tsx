@@ -12,7 +12,7 @@ import { FileMenu } from '@/shared/components/FileMenu';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { downloadHtml } from '@/core/exporter/htmlExporter';
 import { toast } from '@/hooks/use-toast';
-import { Layers, Download, Eye, Code2, PanelLeft } from 'lucide-react';
+import { Layers, Download, Eye, Code2, PanelLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   ResizablePanelGroup,
@@ -97,8 +97,13 @@ Pricing[
 quote[Simplicity is the ultimate sophistication. - Leonardo da Vinci]
 `;
 
-export function BlockApp() {
-  const [content, setContent] = useState(DEFAULT_CONTENT);
+interface BlockAppProps {
+  initialContent?: string;
+  onBack: () => void;
+}
+
+export function BlockApp({ initialContent, onBack }: BlockAppProps) {
+  const [content, setContent] = useState(initialContent || DEFAULT_CONTENT);
   const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>('split');
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
@@ -167,6 +172,9 @@ export function BlockApp() {
       {/* Header */}
       <header className="flex h-12 items-center justify-between border-b border-border bg-card px-4">
         <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <Layers className="h-5 w-5 text-primary" />
           <span className="font-semibold text-foreground">Netral Block</span>
           <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">
