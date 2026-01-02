@@ -23,6 +23,7 @@ import {
 interface FloatingToolbarProps {
   onInsert: (text: string) => void;
   onWrap: (prefix: string, suffix: string) => void;
+  mode?: 'block' | 'deck';
 }
 
 interface ToolbarButton {
@@ -31,7 +32,7 @@ interface ToolbarButton {
   action: () => void;
 }
 
-export function FloatingToolbar({ onInsert, onWrap }: FloatingToolbarProps) {
+export function FloatingToolbar({ onInsert, onWrap, mode = 'block' }: FloatingToolbarProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const buttons: ToolbarButton[] = [
