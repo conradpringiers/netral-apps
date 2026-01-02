@@ -11,14 +11,17 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, CompletionContext, Completion } from '@codemirror/autocomplete';
 
+export type EditorMode = 'block' | 'deck';
+
 interface EditorProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  mode?: EditorMode;
 }
 
-// Netral element snippets for Type & Tab
-const netralSnippets: Record<string, string> = {
+// Block mode snippets (sites)
+const blockSnippets: Record<string, string> = {
   'Feature': `Feature[
 {🚀;Title;Description}
 {⚡;Title;Description}
@@ -68,21 +71,57 @@ const netralSnippets: Record<string, string> = {
 ]`,
 };
 
+// Deck mode snippets (presentations)
+const deckSnippets: Record<string, string> = {
+  'slide': `-- Titre de la slide`,
+  'Feature': `Feature[
+{🚀;Title;Description}
+{⚡;Title;Description}
+]`,
+  'Column': `Column[
+{
+## Gauche
+Contenu gauche
+}
+{
+## Droite
+Contenu droite
+}
+]`,
+  'Stats': `Stats[
+{100+;Métrique}
+{50K;Valeur}
+]`,
+  'Image': `Image[https://example.com/image.jpg]`,
+  'Warn': `Warn[Message d'avertissement]`,
+  'Def': `Def[Information importante]`,
+  'quote': `quote[Votre citation ici]`,
+  'Bigtitle': `Bigtitle[Titre principal]`,
+};
+
+// Get snippets based on mode
+function getSnippetsForMode(mode: EditorMode): Record<string, string> {
+  return mode === 'deck' ? deckSnippets : blockSnippets;
+}
+
 // Autocompletion for Netral elements
-function netralCompletions(context: CompletionContext) {
-  const word = context.matchBefore(/\w*/);
-  if (!word || (word.from === word.to && !context.explicit)) return null;
+function createNetralCompletions(mode: EditorMode) {
+  return (context: CompletionContext) => {
+    const word = context.matchBefore(/\w*/);
+    if (!word || (word.from === word.to && !context.explicit)) return null;
 
-  const completions: Completion[] = Object.entries(netralSnippets).map(([label, snippet]) => ({
-    label,
-    type: 'keyword',
-    apply: snippet,
-    detail: 'Netral element',
-  }));
+    const snippets = getSnippetsForMode(mode);
+    const completions: Completion[] = Object.entries(snippets).map(([label, snippet]) => ({
+      label,
+      type: 'keyword',
+      apply: snippet,
+      detail: mode === 'deck' ? 'Slide element' : 'Netral element',
+    }));
 
-  return {
-    from: word.from,
-    options: completions.filter(c => c.label.toLowerCase().startsWith(word.text.toLowerCase())),
+    return {
+      from: word.from,
+      options: completions.filter(c => c.label.toLowerCase().startsWith(word.text.toLowerCase())),
+    };
   };
 }
 
@@ -155,7 +194,7 @@ export interface EditorMethods {
 }
 
 export const Editor = forwardRef<EditorMethods, EditorProps>(
-  ({ value, onChange, className = '' }, ref) => {
+  ({ value, onChange, className = '', mode = 'block' }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<EditorView | null>(null);
 
@@ -229,7 +268,7 @@ export const Editor = forwardRef<EditorMethods, EditorProps>(
 
           // Autocompletion with Netral snippets
           autocompletion({
-            override: [netralCompletions],
+            override: [createNetralCompletions(mode)],
             activateOnTyping: true,
           }),
 
