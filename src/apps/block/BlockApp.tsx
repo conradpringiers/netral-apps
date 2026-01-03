@@ -184,12 +184,13 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
             documentTitle={documentTitle} 
             content={content} 
             onLoad={handleLoadFile}
+            fileExtension=".netblock"
           />
         </div>
 
         <div className="flex items-center gap-2">
           {/* Help */}
-          <HelpModal />
+          <HelpModal mode="block" />
           
           {/* View mode toggle */}
           <div className="flex items-center bg-muted rounded-md p-0.5">

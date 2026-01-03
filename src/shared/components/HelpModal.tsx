@@ -1,6 +1,6 @@
 /**
  * Help Modal Component
- * Complete guide with concept explanation and syntax reference
+ * Mode-specific guide with syntax reference
  */
 
 import {
@@ -11,11 +11,15 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, Zap, Palette, Code, Layout, FileText, Sparkles } from 'lucide-react';
+import { HelpCircle, Zap, Palette, Code, Layout, FileText, Sparkles, Presentation } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const syntaxReference = [
+interface HelpModalProps {
+  mode?: 'block' | 'deck';
+}
+
+const blockSyntaxReference = [
   {
     category: 'Document Setup',
     icon: '📄',
@@ -87,7 +91,60 @@ const syntaxReference = [
   },
 ];
 
-export function HelpModal() {
+const deckSyntaxReference = [
+  {
+    category: 'Document Setup',
+    icon: '📄',
+    items: [
+      { name: 'Title', syntax: '--- Presentation Title', description: 'Sets the presentation title' },
+      { name: 'Theme', syntax: 'Theme[Modern]', description: 'Available: Modern, Natural, Latte, Dark Mode, Terminal, Ocean, Solarized, Midnight, Minimal' },
+      { name: 'New Slide', syntax: '-- Slide Title', description: 'Creates a new slide with title' },
+    ],
+  },
+  {
+    category: 'Slide Content',
+    icon: '🖼️',
+    items: [
+      { name: 'Image', syntax: 'Image[https://example.com/image.jpg]', description: 'Display an image on slide' },
+      { name: 'Bigtitle', syntax: 'Bigtitle[Large Text]', description: 'Large centered title' },
+      { name: 'Column', syntax: 'Column[\n{Left content}\n{Right content}\n]', description: 'Two-column layout' },
+    ],
+  },
+  {
+    category: 'Components',
+    icon: '🧩',
+    items: [
+      { name: 'Feature', syntax: 'Feature[\n{🚀;Title;Description}\n]', description: 'Feature cards with emoji/icon' },
+      { name: 'Stats', syntax: 'Stats[\n{100+;Clients}\n{50K;Downloads}\n]', description: 'Key statistics display' },
+    ],
+  },
+  {
+    category: 'Callouts',
+    icon: '📌',
+    items: [
+      { name: 'Warn', syntax: 'Warn[Warning message]', description: 'Warning/alert callout' },
+      { name: 'Def', syntax: 'Def[Info message]', description: 'Info/definition callout' },
+      { name: 'quote', syntax: 'quote[Your quote here]', description: 'Styled quote block' },
+    ],
+  },
+  {
+    category: 'Markdown',
+    icon: '📝',
+    items: [
+      { name: 'Bold', syntax: '**bold text**', description: 'Bold formatting' },
+      { name: 'Italic', syntax: '*italic text*', description: 'Italic formatting' },
+      { name: 'Link', syntax: '[text](url)', description: 'Hyperlink' },
+      { name: 'List', syntax: '- Item 1\n- Item 2', description: 'Bullet list' },
+    ],
+  },
+];
+
+export function HelpModal({ mode = 'block' }: HelpModalProps) {
+  const isBlock = mode === 'block';
+  const syntaxReference = isBlock ? blockSyntaxReference : deckSyntaxReference;
+  const title = isBlock ? 'Netral Block Guide' : 'Netral Deck Guide';
+  const Icon = isBlock ? Sparkles : Presentation;
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -98,8 +155,8 @@ export function HelpModal() {
       <DialogContent className="max-w-3xl max-h-[85vh] p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Netral Block Guide
+            <Icon className="h-5 w-5 text-primary" />
+            {title}
           </DialogTitle>
         </DialogHeader>
         
@@ -124,11 +181,14 @@ export function HelpModal() {
               <TabsContent value="overview" className="mt-0 space-y-6">
                 {/* Hero */}
                 <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-6 border border-primary/20">
-                  <h3 className="text-lg font-semibold mb-2">What is Netral?</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {isBlock ? 'What is Netral Block?' : 'What is Netral Deck?'}
+                  </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Netral is a simple markup language that lets you create beautiful, responsive websites 
-                    without writing HTML or CSS. Just write your content using intuitive syntax, and Netral 
-                    transforms it into a polished, professional page.
+                    {isBlock 
+                      ? 'Netral Block is a simple markup language that lets you create beautiful, responsive websites without writing HTML or CSS. Just write your content using intuitive syntax, and Netral transforms it into a polished, professional page.'
+                      : 'Netral Deck is a simple markup language for creating beautiful presentations. Write your slides using intuitive syntax and present them in fullscreen mode with keyboard navigation.'
+                    }
                   </p>
                 </div>
                 
@@ -163,10 +223,13 @@ export function HelpModal() {
                       <div className="p-2 rounded-md bg-primary/10">
                         <FileText className="h-4 w-4 text-primary" />
                       </div>
-                      <h4 className="font-medium">Export HTML</h4>
+                      <h4 className="font-medium">{isBlock ? 'Export HTML' : 'Fullscreen Mode'}</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Export your site as a standalone HTML file ready to host anywhere.
+                      {isBlock 
+                        ? 'Export your site as a standalone HTML file ready to host anywhere.'
+                        : 'Launch your presentation in fullscreen with keyboard navigation (arrows, space, escape).'
+                      }
                     </p>
                   </div>
                   
@@ -187,15 +250,31 @@ export function HelpModal() {
                 <div>
                   <h3 className="font-semibold mb-3">Quick Start</h3>
                   <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm space-y-1">
-                    <p className="text-muted-foreground">--- My Website</p>
-                    <p className="text-muted-foreground">Theme[Modern]</p>
-                    <p className="text-muted-foreground">Logo[My Brand]</p>
-                    <p className="text-muted-foreground">Header[BigText;Welcome;Your tagline here;;#]</p>
-                    <p className="text-muted-foreground">-- Features</p>
-                    <p className="text-muted-foreground">Feature[</p>
-                    <p className="text-muted-foreground pl-4">{'{'}🚀;Fast;Lightning quick{'}'}</p>
-                    <p className="text-muted-foreground pl-4">{'{'}💎;Beautiful;Stunning design{'}'}</p>
-                    <p className="text-muted-foreground">]</p>
+                    {isBlock ? (
+                      <>
+                        <p className="text-muted-foreground">--- My Website</p>
+                        <p className="text-muted-foreground">Theme[Modern]</p>
+                        <p className="text-muted-foreground">Logo[My Brand]</p>
+                        <p className="text-muted-foreground">Header[BigText;Welcome;Your tagline here;;#]</p>
+                        <p className="text-muted-foreground">-- Features</p>
+                        <p className="text-muted-foreground">Feature[</p>
+                        <p className="text-muted-foreground pl-4">{'{'}🚀;Fast;Lightning quick{'}'}</p>
+                        <p className="text-muted-foreground pl-4">{'{'}💎;Beautiful;Stunning design{'}'}</p>
+                        <p className="text-muted-foreground">]</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-muted-foreground">--- My Presentation</p>
+                        <p className="text-muted-foreground">Theme[Modern]</p>
+                        <p className="text-muted-foreground">-- Welcome</p>
+                        <p className="text-muted-foreground">Bigtitle[Hello World]</p>
+                        <p className="text-muted-foreground">-- Features</p>
+                        <p className="text-muted-foreground">Feature[</p>
+                        <p className="text-muted-foreground pl-4">{'{'}🚀;Fast;Quick to create{'}'}</p>
+                        <p className="text-muted-foreground pl-4">{'{'}🎨;Beautiful;Stunning slides{'}'}</p>
+                        <p className="text-muted-foreground">]</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </TabsContent>
@@ -231,7 +310,7 @@ export function HelpModal() {
               
               <TabsContent value="themes" className="mt-0 space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Change your site's appearance instantly with the Theme element. Each theme includes 
+                  Change your {isBlock ? 'site' : 'presentation'}'s appearance instantly with the Theme element. Each theme includes 
                   carefully chosen colors, fonts, and styling.
                 </p>
                 
