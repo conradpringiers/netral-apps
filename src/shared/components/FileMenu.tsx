@@ -1,6 +1,6 @@
 /**
  * File Menu Component
- * Handles save/load functionality for .netblock files
+ * Handles save/load functionality for .netblock and .netdeck files
  */
 
 import { useRef } from 'react';
@@ -19,19 +19,21 @@ interface FileMenuProps {
   documentTitle: string;
   content: string;
   onLoad: (content: string) => void;
+  fileExtension?: string;
 }
 
-export function FileMenu({ documentTitle, content, onLoad }: FileMenuProps) {
+export function FileMenu({ documentTitle, content, onLoad, fileExtension = '.netblock' }: FileMenuProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const displayTitle = documentTitle || 'Untitled';
+  const acceptTypes = fileExtension === '.netdeck' ? '.netdeck,.txt' : '.netblock,.txt';
   
   const handleSave = () => {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${displayTitle.replace(/[^a-z0-9]/gi, '_')}.netblock`;
+    a.download = `${displayTitle.replace(/[^a-z0-9]/gi, '_')}${fileExtension}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -39,7 +41,7 @@ export function FileMenu({ documentTitle, content, onLoad }: FileMenuProps) {
     
     toast({
       title: 'File saved',
-      description: `${displayTitle}.netblock has been downloaded.`,
+      description: `${displayTitle}${fileExtension} has been downloaded.`,
     });
   };
   
@@ -71,7 +73,7 @@ export function FileMenu({ documentTitle, content, onLoad }: FileMenuProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".netblock,.txt"
+        accept={acceptTypes}
         onChange={handleFileChange}
         className="hidden"
       />
@@ -86,7 +88,7 @@ export function FileMenu({ documentTitle, content, onLoad }: FileMenuProps) {
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={handleSave}>
             <Save className="h-4 w-4 mr-2" />
-            Save as .netblock
+            Save as {fileExtension}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLoad}>

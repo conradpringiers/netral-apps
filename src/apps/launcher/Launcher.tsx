@@ -3,79 +3,147 @@
  * Gallery view to select between different Netral tools
  */
 
-import { Layers, Presentation } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Layers, Presentation, Upload, FileText } from 'lucide-react';
 
 export type NetralMode = 'block' | 'deck' | null;
 
 interface LauncherProps {
-  onSelectMode: (mode: NetralMode) => void;
+  onSelectMode: (mode: NetralMode, content?: string) => void;
 }
 
 const tools = [
   {
     id: 'block' as const,
     name: 'Netral Block',
-    description: 'Créez des sites web avec une syntaxe simple et intuitive',
+    description: 'Create websites with simple, intuitive syntax',
     icon: Layers,
-    color: 'from-blue-500 to-indigo-600',
+    color: 'bg-blue-500',
   },
   {
     id: 'deck' as const,
     name: 'Netral Deck',
-    description: 'Créez des présentations élégantes avec des slides interactives',
+    description: 'Create elegant presentations with interactive slides',
     icon: Presentation,
-    color: 'from-purple-500 to-pink-600',
+    color: 'bg-purple-500',
   },
 ];
 
 export function Launcher({ onSelectMode }: LauncherProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleFileLoad = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (ext === 'netdeck') {
+        onSelectMode('deck', content);
+      } else {
+        onSelectMode('block', content);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileLoad(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileLoad(file);
+    }
+    e.target.value = '';
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="max-w-2xl w-full">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4">
-            Netral<span className="text-blue-400">.</span>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">
+            Netral<span className="text-blue-500">.</span>
           </h1>
-          <p className="text-xl text-slate-400">
-            Choisissez votre outil de création
+          <p className="text-slate-500">
+            Choose your creation tool
           </p>
         </div>
 
         {/* Tools Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid sm:grid-cols-2 gap-4 mb-6">
           {tools.map((tool) => (
             <button
               key={tool.id}
               onClick={() => onSelectMode(tool.id)}
-              className="group relative bg-slate-800/50 border border-slate-700 rounded-2xl p-8 text-left transition-all duration-300 hover:border-slate-500 hover:bg-slate-800/80 hover:scale-[1.02] hover:shadow-2xl"
+              className="group bg-white border border-slate-200 rounded-xl p-5 text-left transition-all duration-200 hover:border-slate-300 hover:shadow-md"
             >
-              {/* Gradient overlay on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${tool.color} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`} />
-              
               {/* Icon */}
-              <div className={`inline-flex p-4 rounded-xl bg-gradient-to-br ${tool.color} mb-6`}>
-                <tool.icon className="h-8 w-8 text-white" />
+              <div className={`inline-flex p-3 rounded-lg ${tool.color} mb-4`}>
+                <tool.icon className="h-5 w-5 text-white" />
               </div>
 
               {/* Content */}
-              <h2 className="text-2xl font-bold text-white mb-2">{tool.name}</h2>
-              <p className="text-slate-400">{tool.description}</p>
-
-              {/* Arrow indicator */}
-              <div className="absolute bottom-8 right-8 text-slate-600 group-hover:text-white group-hover:translate-x-2 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </div>
+              <h2 className="text-lg font-semibold text-slate-900 mb-1">{tool.name}</h2>
+              <p className="text-slate-500 text-sm">{tool.description}</p>
             </button>
           ))}
         </div>
 
-        {/* Footer hint */}
-        <p className="text-center text-slate-500 mt-12 text-sm">
-          Vous pouvez aussi charger un fichier .netblock ou .netdeck pour ouvrir directement le bon outil
-        </p>
+        {/* Drag & Drop Area */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".netblock,.netdeck,.txt"
+          onChange={handleFileInput}
+          className="hidden"
+        />
+        
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          className={`w-full border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+            isDragOver 
+              ? 'border-blue-400 bg-blue-50' 
+              : 'border-slate-200 bg-white hover:border-slate-300'
+          }`}
+        >
+          <div className="flex flex-col items-center gap-2">
+            <div className={`p-2 rounded-full ${isDragOver ? 'bg-blue-100' : 'bg-slate-100'}`}>
+              {isDragOver ? (
+                <FileText className="h-5 w-5 text-blue-500" />
+              ) : (
+                <Upload className="h-5 w-5 text-slate-400" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-700">
+                {isDragOver ? 'Drop file here' : 'Drop a file or click to open'}
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                .netblock or .netdeck
+              </p>
+            </div>
+          </div>
+        </button>
       </div>
     </div>
   );

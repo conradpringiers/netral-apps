@@ -9,10 +9,11 @@ import { DeckRenderer } from '@/core/renderer/DeckRenderer';
 import { PresentationMode } from '@/core/renderer/PresentationMode';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
+import { FileMenu } from '@/shared/components/FileMenu';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { parseDeckDocument, getDefaultDeckContent } from '@/core/parser/deckParser';
 import { toast } from '@/hooks/use-toast';
-import { Presentation, Play, Eye, Code2, PanelLeft, ChevronLeft, ChevronRight, Save, FolderOpen, ArrowLeft } from 'lucide-react';
+import { Presentation, Play, Eye, Code2, PanelLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   ResizablePanelGroup,
@@ -24,12 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 interface DeckAppProps {
   initialContent?: string;
@@ -42,7 +37,6 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPresenting, setIsPresenting] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const charCount = getCharCount(content);
   
@@ -56,7 +50,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
   }, [content]);
   
   const totalSlides = doc?.slides.length || 0;
-  const documentTitle = doc?.title || 'Présentation';
+  const documentTitle = doc?.title || 'Presentation';
 
   // Editor action handlers
   const handleInsert = useCallback((text: string) => {
@@ -76,8 +70,8 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
   const handleLaunch = () => {
     if (totalSlides === 0) {
       toast({
-        title: 'Aucune slide',
-        description: 'Ajoutez des slides avec -- Titre de slide',
+        title: 'No slides',
+        description: 'Add slides with -- Slide Title',
         variant: 'destructive',
       });
       return;
@@ -85,53 +79,9 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
     setIsPresenting(true);
   };
   
-  const handleSave = () => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${documentTitle || 'presentation'}.netdeck`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast({
-      title: 'Fichier sauvegardé',
-      description: `${documentTitle}.netdeck`,
-    });
-  };
-  
-  const handleLoad = () => {
-    fileInputRef.current?.click();
-  };
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        setContent(text);
-        setCurrentSlide(0);
-      };
-      reader.readAsText(file);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  // Slide navigation
-  const goToPrevSlide = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1);
-    }
-  };
-
-  const goToNextSlide = () => {
-    if (currentSlide < totalSlides - 1) {
-      setCurrentSlide(currentSlide + 1);
-    }
+  const handleLoad = (loadedContent: string) => {
+    setContent(loadedContent);
+    setCurrentSlide(0);
   };
 
   // Keyboard shortcuts
@@ -148,10 +98,6 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
           case 'i':
             e.preventDefault();
             handleWrap('*', '*');
-            break;
-          case 's':
-            e.preventDefault();
-            handleSave();
             break;
         }
       }
@@ -182,15 +128,6 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      {/* Hidden file input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept=".netdeck,.txt"
-        className="hidden"
-      />
-      
       {/* Header */}
       <header className="flex h-12 items-center justify-between border-b border-border bg-card px-4">
         <div className="flex items-center gap-3">
@@ -203,52 +140,18 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             {charCount} chars
           </span>
           
-          {/* File menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">Fichier</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleSave}>
-                <Save className="h-4 w-4 mr-2" />
-                Sauvegarder
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLoad}>
-                <FolderOpen className="h-4 w-4 mr-2" />
-                Ouvrir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* File menu with dropdown */}
+          <FileMenu 
+            documentTitle={documentTitle} 
+            content={content} 
+            onLoad={handleLoad}
+            fileExtension=".netdeck"
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Slide navigation */}
-          <div className="flex items-center gap-1 mr-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={goToPrevSlide}
-              disabled={currentSlide === 0}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground min-w-[60px] text-center">
-              {totalSlides > 0 ? `${currentSlide + 1} / ${totalSlides}` : '0 / 0'}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={goToNextSlide}
-              disabled={currentSlide >= totalSlides - 1}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
           {/* Help */}
-          <HelpModal />
+          <HelpModal mode="deck" />
           
           {/* View mode toggle */}
           <div className="flex items-center bg-muted rounded-md p-0.5">
@@ -263,7 +166,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
                   <Code2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Éditeur seul</TooltipContent>
+              <TooltipContent>Editor only</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -277,7 +180,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
                   <PanelLeft className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Vue partagée</TooltipContent>
+              <TooltipContent>Split view</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -291,7 +194,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Aperçu seul</TooltipContent>
+              <TooltipContent>Preview only</TooltipContent>
             </Tooltip>
           </div>
 
@@ -303,7 +206,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             className="gap-2 bg-purple-600 hover:bg-purple-700"
           >
             <Play className="h-4 w-4" />
-            Lancer
+            Launch
           </Button>
         </div>
       </header>
@@ -320,9 +223,11 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="h-full overflow-hidden bg-slate-900">
-                <DeckRenderer content={content} currentSlide={currentSlide} />
-              </div>
+              <DeckRenderer 
+                content={content} 
+                currentSlide={currentSlide} 
+                onSlideChange={setCurrentSlide}
+              />
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : viewMode === 'editor' ? (
@@ -331,9 +236,11 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
           </div>
         ) : (
-          <div className="h-full overflow-hidden bg-slate-900">
-            <DeckRenderer content={content} currentSlide={currentSlide} />
-          </div>
+          <DeckRenderer 
+            content={content} 
+            currentSlide={currentSlide} 
+            onSlideChange={setCurrentSlide}
+          />
         )}
       </div>
     </div>
