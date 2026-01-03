@@ -53,14 +53,14 @@ export function DeckRenderer({ content, currentSlide, className = '', onSlideCha
 
   return (
     <div 
-      className={`h-full flex items-center justify-center p-6 ${className}`}
+      className={`h-full flex items-center justify-center p-4 md:p-6 ${className}`}
       style={{ 
         backgroundColor: '#1e293b',
       }}
     >
-      {/* Slide Card with 16:9 aspect ratio */}
+      {/* Slide Card with 16:9 aspect ratio - responsive sizing */}
       <div 
-        className="relative w-full max-w-4xl"
+        className="relative w-full max-w-4xl max-h-full"
         style={{ aspectRatio: '16/9' }}
       >
         <div 
@@ -92,8 +92,8 @@ export function DeckRenderer({ content, currentSlide, className = '', onSlideCha
             </div>
             
             {/* Slide content */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-auto">
-              <div className="w-full max-w-3xl space-y-4">
+            <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-6 overflow-auto min-h-0">
+              <div className="w-full max-w-3xl space-y-3 md:space-y-4">
                 {slide.content.map((block, index) => (
                   <SlideBlock key={index} block={block} />
                 ))}
@@ -141,7 +141,7 @@ function SlideBlock({ block }: { block: SlideContent }) {
     
     case 'bigtitle':
       return (
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-[hsl(var(--primary))]">
+        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-center text-[hsl(var(--primary))]">
           {block.content}
         </h2>
       );
@@ -152,7 +152,7 @@ function SlideBlock({ block }: { block: SlideContent }) {
           <img 
             src={block.content} 
             alt="Slide image" 
-            className="max-h-48 rounded-lg shadow-lg"
+            className="max-h-32 md:max-h-48 rounded-lg shadow-lg object-contain"
           />
         </div>
       );
@@ -160,11 +160,12 @@ function SlideBlock({ block }: { block: SlideContent }) {
     case 'column':
       const columns = block.props?.columns || [];
       return (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           {columns.map((col: string, idx: number) => (
             <div 
               key={idx}
-              className="p-4 bg-[hsl(var(--card))] rounded-lg text-sm"
+              className="p-2 md:p-4 bg-[hsl(var(--card))] rounded-lg text-xs md:text-sm prose prose-sm max-w-none overflow-hidden"
+              style={{ color: 'hsl(var(--foreground))' }}
               dangerouslySetInnerHTML={{ __html: renderMarkdown(col) }}
             />
           ))}
@@ -174,12 +175,12 @@ function SlideBlock({ block }: { block: SlideContent }) {
     case 'feature':
       const features = block.props?.items || [];
       return (
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
           {features.map((item: { icon: string; title: string; description: string }, idx: number) => (
-            <div key={idx} className="text-center p-4 bg-[hsl(var(--card))] rounded-lg">
-              <div className="text-2xl mb-2">{item.icon}</div>
-              <h3 className="font-bold text-sm mb-1 text-[hsl(var(--foreground))]">{item.title}</h3>
-              <p className="text-[hsl(var(--muted-foreground))] text-xs">{item.description}</p>
+            <div key={idx} className="text-center p-2 md:p-4 bg-[hsl(var(--card))] rounded-lg">
+              <div className="text-lg md:text-2xl mb-1 md:mb-2">{item.icon}</div>
+              <h3 className="font-bold text-xs md:text-sm mb-1 text-[hsl(var(--foreground))]">{item.title}</h3>
+              <p className="text-[hsl(var(--muted-foreground))] text-[10px] md:text-xs line-clamp-2">{item.description}</p>
             </div>
           ))}
         </div>
@@ -188,13 +189,13 @@ function SlideBlock({ block }: { block: SlideContent }) {
     case 'stats':
       const stats = block.props?.items || [];
       return (
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
           {stats.map((item: { value: string; label: string }, idx: number) => (
-            <div key={idx} className="text-center p-4">
-              <div className="text-3xl font-bold text-[hsl(var(--primary))] mb-1">
+            <div key={idx} className="text-center p-2 md:p-4">
+              <div className="text-xl md:text-3xl font-bold text-[hsl(var(--primary))] mb-1">
                 {item.value}
               </div>
-              <div className="text-[hsl(var(--muted-foreground))] text-sm">{item.label}</div>
+              <div className="text-[hsl(var(--muted-foreground))] text-xs md:text-sm">{item.label}</div>
             </div>
           ))}
         </div>
