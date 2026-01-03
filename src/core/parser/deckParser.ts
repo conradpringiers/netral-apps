@@ -183,7 +183,17 @@ function parseColumnContent(content: string): string[] {
   const columns: string[] = [];
   const matches = content.matchAll(/\{([^}]*)\}/g);
   for (const match of matches) {
-    columns.push(match[1].trim());
+    // Strip out any block elements - columns only allow text/markdown
+    let columnText = match[1].trim();
+    // Remove Image[], Warn[], Def[], Feature[], Stats[], etc.
+    columnText = columnText.replace(/Image\[[^\]]*\]/g, '');
+    columnText = columnText.replace(/Warn\[[^\]]*\]/g, '');
+    columnText = columnText.replace(/Def\[[^\]]*\]/g, '');
+    columnText = columnText.replace(/Feature\[[\s\S]*?\]/g, '');
+    columnText = columnText.replace(/Stats\[[\s\S]*?\]/g, '');
+    columnText = columnText.replace(/Bigtitle\[[^\]]*\]/g, '');
+    columnText = columnText.replace(/quote\[[^\]]*\]/g, '');
+    columns.push(columnText.trim());
   }
   return columns;
 }
