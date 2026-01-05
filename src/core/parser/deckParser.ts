@@ -181,20 +181,45 @@ function parseSlideContent(content: string): SlideContent[] {
 
 function parseColumnContent(content: string): string[] {
   const columns: string[] = [];
-  const matches = content.matchAll(/\{([^}]*)\}/g);
-  for (const match of matches) {
-    // Strip out any block elements - columns only allow text/markdown
-    let columnText = match[1].trim();
-    // Remove Image[], Warn[], Def[], Feature[], Stats[], etc.
-    columnText = columnText.replace(/Image\[[^\]]*\]/g, '');
-    columnText = columnText.replace(/Warn\[[^\]]*\]/g, '');
-    columnText = columnText.replace(/Def\[[^\]]*\]/g, '');
-    columnText = columnText.replace(/Feature\[[\s\S]*?\]/g, '');
-    columnText = columnText.replace(/Stats\[[\s\S]*?\]/g, '');
-    columnText = columnText.replace(/Bigtitle\[[^\]]*\]/g, '');
-    columnText = columnText.replace(/quote\[[^\]]*\]/g, '');
-    columns.push(columnText.trim());
+  // Match content between { and }, allowing for nested content
+  let depth = 0;
+  let currentColumn = '';
+  let inColumn = false;
+  
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    
+    if (char === '{') {
+      if (depth === 0) {
+        inColumn = true;
+        currentColumn = '';
+      } else {
+        currentColumn += char;
+      }
+      depth++;
+    } else if (char === '}') {
+      depth--;
+      if (depth === 0 && inColumn) {
+        // Strip out any block elements - columns only allow text/markdown
+        let columnText = currentColumn.trim();
+        // Remove Image[], Warn[], Def[], Feature[], Stats[], etc.
+        columnText = columnText.replace(/Image\[[^\]]*\]/g, '');
+        columnText = columnText.replace(/Warn\[[^\]]*\]/g, '');
+        columnText = columnText.replace(/Def\[[^\]]*\]/g, '');
+        columnText = columnText.replace(/Feature\[[\s\S]*?\]/g, '');
+        columnText = columnText.replace(/Stats\[[\s\S]*?\]/g, '');
+        columnText = columnText.replace(/Bigtitle\[[^\]]*\]/g, '');
+        columnText = columnText.replace(/quote\[[^\]]*\]/g, '');
+        columns.push(columnText.trim());
+        inColumn = false;
+      } else {
+        currentColumn += char;
+      }
+    } else if (inColumn) {
+      currentColumn += char;
+    }
   }
+  
   return columns;
 }
 

@@ -31,7 +31,8 @@ export function PresentationMode({
   }, [currentSlide, onSlideChange]);
 
   const goToNextSlide = useCallback(() => {
-    if (currentSlide < totalSlides - 1) {
+    // +1 for intro slide
+    if (currentSlide < totalSlides) {
       onSlideChange(currentSlide + 1);
     }
   }, [currentSlide, totalSlides, onSlideChange]);
@@ -63,7 +64,8 @@ export function PresentationMode({
           break;
         case 'End':
           e.preventDefault();
-          onSlideChange(totalSlides - 1);
+          onSlideChange(totalSlides); // +1 for intro slide
+          break;
           break;
       }
     };
@@ -94,7 +96,7 @@ export function PresentationMode({
       <button
         onClick={onClose}
         className="absolute top-4 right-4 z-50 p-2 text-white/50 hover:text-white transition-colors"
-        title="Fermer (Échap)"
+        title="Close (Escape)"
       >
         <X className="h-6 w-6" />
       </button>
@@ -104,23 +106,23 @@ export function PresentationMode({
         onClick={goToPrevSlide}
         disabled={currentSlide === 0}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/30 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        title="Slide précédente (←)"
+        title="Previous slide (←)"
       >
         <ChevronLeft className="h-10 w-10" />
       </button>
 
       <button
         onClick={goToNextSlide}
-        disabled={currentSlide === totalSlides - 1}
+        disabled={currentSlide === totalSlides}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/30 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        title="Slide suivante (→)"
+        title="Next slide (→)"
       >
         <ChevronRight className="h-10 w-10" />
       </button>
 
-      {/* Slide counter */}
+      {/* Slide counter - adjusted for intro slide */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 text-white/50 text-sm">
-        {currentSlide + 1} / {totalSlides}
+        {currentSlide === 0 ? 'Intro' : `${currentSlide} / ${totalSlides}`}
       </div>
 
       {/* Slide content - fullscreen, no card wrapper */}
@@ -148,7 +150,10 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
 
   const theme = getTheme(doc.theme);
   const themeCSS = generateThemeCSS(theme);
-  const slide = doc.slides[Math.min(currentSlide, doc.slides.length - 1)];
+  
+  // currentSlide === 0 is the intro slide
+  const isIntroSlide = currentSlide === 0;
+  const slide = isIntroSlide ? null : doc.slides[Math.min(currentSlide - 1, doc.slides.length - 1)];
 
   return (
     <div 
@@ -171,23 +176,35 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
         .fullscreen-slide { ${themeCSS} }
       `}</style>
       
-      <div className="fullscreen-slide h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
-        {/* Slide title at top left */}
-        <div className="px-8 pt-6 pb-4 border-b border-[hsl(var(--border))]">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--foreground))]">
-            {slide.title}
+      {isIntroSlide ? (
+        // Intro slide with presentation title
+        <div className="fullscreen-slide h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center justify-center">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center text-[hsl(var(--primary))] px-8">
+            {doc.title}
           </h1>
+          <p className="text-lg md:text-xl text-[hsl(var(--muted-foreground))] mt-6">
+            {doc.slides.length} slides
+          </p>
         </div>
-        
-        {/* Slide content - centered and responsive */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-auto">
-          <div className="w-full max-w-5xl space-y-6">
-            {slide.content.map((block, index) => (
-              <FullscreenSlideBlock key={index} block={block} />
-            ))}
+      ) : slide ? (
+        <div className="fullscreen-slide h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
+          {/* Slide title at top left */}
+          <div className="px-8 pt-6 pb-4 border-b border-[hsl(var(--border))]">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--foreground))]">
+              {slide.title}
+            </h1>
+          </div>
+          
+          {/* Slide content - centered and responsive */}
+          <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-auto">
+            <div className="w-full max-w-5xl space-y-6">
+              {slide.content.map((block, index) => (
+                <FullscreenSlideBlock key={index} block={block} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
