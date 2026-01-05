@@ -92,15 +92,15 @@ export function Launcher({ onSelectMode }: LauncherProps) {
             <button
               key={tool.id}
               onClick={() => onSelectMode(tool.id)}
-              className="group bg-white border border-slate-200 rounded-xl p-5 text-left transition-all duration-200 hover:border-slate-300 hover:shadow-md"
+              className="group bg-white border border-slate-200 rounded-xl p-5 text-left transition-all duration-300 hover:border-slate-300 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
             >
               {/* Icon */}
-              <div className={`inline-flex p-3 rounded-lg ${tool.color} mb-4`}>
+              <div className={`inline-flex p-3 rounded-lg ${tool.color} mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                 <tool.icon className="h-5 w-5 text-white" />
               </div>
 
               {/* Content */}
-              <h2 className="text-lg font-semibold text-slate-900 mb-1">{tool.name}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-1 transition-colors duration-300 group-hover:text-blue-600">{tool.name}</h2>
               <p className="text-slate-500 text-sm">{tool.description}</p>
             </button>
           ))}

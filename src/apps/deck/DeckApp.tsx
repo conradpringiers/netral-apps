@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Editor, getEditorMethods } from '@/components/Editor';
-import { DeckRenderer } from '@/core/renderer/DeckRenderer';
+import { DeckPreview } from '@/core/renderer/DeckPreview';
 import { PresentationMode } from '@/core/renderer/PresentationMode';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
@@ -223,11 +223,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50} minSize={30}>
-              <DeckRenderer 
-                content={content} 
-                currentSlide={currentSlide} 
-                onSlideChange={setCurrentSlide}
-              />
+              <DeckPreview content={content} />
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : viewMode === 'editor' ? (
@@ -236,11 +232,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
           </div>
         ) : (
-          <DeckRenderer 
-            content={content} 
-            currentSlide={currentSlide} 
-            onSlideChange={setCurrentSlide}
-          />
+          <DeckPreview content={content} />
         )}
       </div>
     </div>
