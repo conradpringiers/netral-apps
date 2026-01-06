@@ -13,9 +13,9 @@ export function NetralApp() {
   const [initialContent, setInitialContent] = useState<string | undefined>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSelectMode = useCallback((selectedMode: NetralMode) => {
+  const handleSelectMode = useCallback((selectedMode: NetralMode, content?: string) => {
     setMode(selectedMode);
-    setInitialContent(undefined);
+    setInitialContent(content);
   }, []);
 
   const handleBack = useCallback(() => {

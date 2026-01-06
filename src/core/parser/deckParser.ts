@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list';
   content: string;
   props?: Record<string, any>;
 }
@@ -98,9 +98,8 @@ function parseSlideContent(content: string): SlideContent[] {
   const elements: SlideContent[] = [];
   let remaining = content;
   
-  // Pattern to match block elements
+  // Pattern to match block elements - Column needs special handling for nested braces
   const blockPatterns = [
-    { type: 'column', pattern: /Column\[([\s\S]*?)\]/g },
     { type: 'feature', pattern: /Feature\[([\s\S]*?)\]/g },
     { type: 'stats', pattern: /Stats\[([\s\S]*?)\]/g },
     { type: 'image', pattern: /Image\[([^\]]+)\]/g },
@@ -108,7 +107,12 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'def', pattern: /Def\[([^\]]+)\]/g },
     { type: 'quote', pattern: /quote\[([^\]]+)\]/g },
     { type: 'bigtitle', pattern: /Bigtitle\[([^\]]+)\]/g },
+    { type: 'timeline', pattern: /Timeline\[([\s\S]*?)\]/g },
+    { type: 'list', pattern: /List\[([\s\S]*?)\]/g },
   ];
+  
+  // Handle Column separately with balanced bracket matching
+  const columnMatches = findColumnBlocks(content);
   
   // Find all matches and their positions
   interface Match {
@@ -121,10 +125,27 @@ function parseSlideContent(content: string): SlideContent[] {
   
   const matches: Match[] = [];
   
+  // Add column matches first
+  for (const colMatch of columnMatches) {
+    matches.push({
+      type: 'column',
+      content: colMatch.content,
+      start: colMatch.start,
+      end: colMatch.end,
+      props: { columns: parseColumnContent(colMatch.content) },
+    });
+  }
+  
   for (const { type, pattern } of blockPatterns) {
     const regex = new RegExp(pattern.source, 'g');
     let match;
     while ((match = regex.exec(content)) !== null) {
+      // Skip if this match overlaps with a column block
+      const overlapsColumn = columnMatches.some(
+        col => match!.index >= col.start && match!.index < col.end
+      );
+      if (overlapsColumn) continue;
+      
       const matchData: Match = {
         type,
         content: match[1],
@@ -133,12 +154,14 @@ function parseSlideContent(content: string): SlideContent[] {
       };
       
       // Parse specific content types
-      if (type === 'column') {
-        matchData.props = { columns: parseColumnContent(match[1]) };
-      } else if (type === 'feature') {
+      if (type === 'feature') {
         matchData.props = { items: parseFeatureItems(match[1]) };
       } else if (type === 'stats') {
         matchData.props = { items: parseStatsItems(match[1]) };
+      } else if (type === 'timeline') {
+        matchData.props = { items: parseTimelineItems(match[1]) };
+      } else if (type === 'list') {
+        matchData.props = { items: parseListItems(match[1]) };
       }
       
       matches.push(matchData);
@@ -248,58 +271,130 @@ function parseStatsItems(content: string): { value: string; label: string }[] {
   return items;
 }
 
+// Find Column blocks with balanced bracket matching
+function findColumnBlocks(content: string): { content: string; start: number; end: number }[] {
+  const results: { content: string; start: number; end: number }[] = [];
+  const columnStart = /Column\[/g;
+  let match;
+  
+  while ((match = columnStart.exec(content)) !== null) {
+    const startIndex = match.index;
+    const contentStart = startIndex + 7; // "Column[".length
+    let depth = 1;
+    let i = contentStart;
+    
+    while (i < content.length && depth > 0) {
+      if (content[i] === '[') depth++;
+      else if (content[i] === ']') depth--;
+      i++;
+    }
+    
+    if (depth === 0) {
+      results.push({
+        content: content.slice(contentStart, i - 1),
+        start: startIndex,
+        end: i,
+      });
+    }
+  }
+  
+  return results;
+}
+
+function parseTimelineItems(content: string): { year: string; title: string; description: string }[] {
+  const items: { year: string; title: string; description: string }[] = [];
+  const matches = content.matchAll(/\{([^;]+);([^;]+);([^}]+)\}/g);
+  for (const match of matches) {
+    items.push({
+      year: match[1].trim(),
+      title: match[2].trim(),
+      description: match[3].trim(),
+    });
+  }
+  return items;
+}
+
+function parseListItems(content: string): { icon: string; text: string }[] {
+  const items: { icon: string; text: string }[] = [];
+  const matches = content.matchAll(/\{([^;]+);([^}]+)\}/g);
+  for (const match of matches) {
+    items.push({
+      icon: match[1].trim(),
+      text: match[2].trim(),
+    });
+  }
+  return items;
+}
+
 /**
  * Get default Deck content
  */
 export function getDefaultDeckContent(): string {
-  return `--- Ma Présentation
+  return `--- My Presentation
 Theme[Modern]
 -- Introduction
-Bigtitle[Bienvenue à ma présentation]
+Bigtitle[Welcome to my presentation]
 
-Cette présentation a été créée avec **Netral Deck**.
+This presentation was created with **Netral Deck**.
 
--- Fonctionnalités
+-- Features
 
 Feature[
-{🚀;Rapide;Créez des slides en quelques minutes}
-{🎨;Thèmes;9 thèmes professionnels disponibles}
-{📱;Responsive;S'adapte à tous les écrans}
+{🚀;Fast;Create slides in minutes}
+{🎨;Themes;9 professional themes available}
+{📱;Responsive;Adapts to all screens}
 ]
 
--- Statistiques
+-- Statistics
 
 Stats[
-{100+;Utilisateurs}
-{50K;Présentations}
+{100+;Users}
+{50K;Presentations}
 {99%;Satisfaction}
 ]
 
--- Colonnes
+-- Columns
 
 Column[
 {
-## Partie gauche
-Un peu de texte avec du **gras**
+## Left side
+Some text with **bold**
 - Point 1
 - Point 2
 }
 {
-## Partie droite
-Image et contenu complémentaire
+## Right side
+Image and complementary content
 }
 ]
 
--- Avertissement
+-- Timeline
 
-Warn[N'oubliez pas de sauvegarder votre travail !]
+Timeline[
+{2020;Launch;Netral Deck was born}
+{2022;Growth;Over 10K users}
+{2024;Today;Global adoption}
+]
 
-Def[Netral Deck utilise une syntaxe simple pour créer des présentations élégantes.]
+-- Checklist
+
+List[
+{✅;Easy to use syntax}
+{✅;Beautiful themes}
+{✅;Export to HTML}
+{🔜;More features coming}
+]
+
+-- Warning
+
+Warn[Don't forget to save your work!]
+
+Def[Netral Deck uses a simple syntax to create elegant presentations.]
 
 -- Conclusion
 
-quote[La simplicité est la sophistication ultime. - Leonardo da Vinci]
+quote[Simplicity is the ultimate sophistication. - Leonardo da Vinci]
 
-Merci pour votre attention !
+Thank you for your attention!
 `;
 }

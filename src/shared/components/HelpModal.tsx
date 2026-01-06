@@ -116,6 +116,8 @@ const deckSyntaxReference = [
     items: [
       { name: 'Feature', syntax: 'Feature[\n{🚀;Title;Description}\n]', description: 'Feature cards with emoji/icon' },
       { name: 'Stats', syntax: 'Stats[\n{100+;Clients}\n{50K;Downloads}\n]', description: 'Key statistics display' },
+      { name: 'Timeline', syntax: 'Timeline[\n{2024;Event;Description}\n]', description: 'Chronological events' },
+      { name: 'List', syntax: 'List[\n{✅;Completed task}\n{🔜;Coming soon}\n]', description: 'Icon list items' },
     ],
   },
   {

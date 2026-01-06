@@ -31,7 +31,7 @@ export function PresentationMode({
   }, [currentSlide, onSlideChange]);
 
   const goToNextSlide = useCallback(() => {
-    // +1 for intro slide
+    // totalSlides doesn't include intro, so max is totalSlides (intro is 0, slides are 1 to totalSlides)
     if (currentSlide < totalSlides) {
       onSlideChange(currentSlide + 1);
     }
@@ -153,7 +153,9 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
   
   // currentSlide === 0 is the intro slide
   const isIntroSlide = currentSlide === 0;
-  const slide = isIntroSlide ? null : doc.slides[Math.min(currentSlide - 1, doc.slides.length - 1)];
+  // currentSlide is 1-indexed for actual slides (1 = first slide, etc.)
+  const slideIndex = currentSlide - 1;
+  const slide = isIntroSlide ? null : doc.slides[slideIndex];
 
   return (
     <div 
@@ -215,15 +217,14 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     case 'text':
       return (
         <div 
-          className="prose prose-lg md:prose-xl max-w-none"
-          style={{ color: 'hsl(var(--foreground))' }}
+          className="prose prose-xl md:prose-2xl lg:prose-3xl max-w-none prose-headings:text-[hsl(var(--foreground))] prose-p:text-[hsl(var(--foreground))] prose-li:text-[hsl(var(--foreground))] prose-strong:text-[hsl(var(--foreground))]"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(block.content) }}
         />
       );
     
     case 'bigtitle':
       return (
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-[hsl(var(--primary))]">
+        <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center text-[hsl(var(--primary))] leading-tight">
           {block.content}
         </h2>
       );
@@ -234,7 +235,7 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
           <img 
             src={block.content} 
             alt="Slide image" 
-            className="max-h-[50vh] rounded-lg shadow-lg object-contain"
+            className="max-h-[60vh] rounded-xl shadow-2xl object-contain"
           />
         </div>
       );
@@ -242,12 +243,11 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     case 'column':
       const columns = block.props?.columns || [];
       return (
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {columns.map((col: string, idx: number) => (
             <div 
               key={idx}
-              className="p-6 bg-[hsl(var(--card))] rounded-lg prose prose-lg max-w-none"
-              style={{ color: 'hsl(var(--foreground))' }}
+              className="p-6 lg:p-8 bg-[hsl(var(--card))] rounded-xl prose prose-lg lg:prose-xl max-w-none prose-headings:text-[hsl(var(--foreground))] prose-p:text-[hsl(var(--foreground))]"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(col) }}
             />
           ))}
@@ -257,12 +257,12 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     case 'feature':
       const features = block.props?.items || [];
       return (
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {features.map((item: { icon: string; title: string; description: string }, idx: number) => (
-            <div key={idx} className="text-center p-6 bg-[hsl(var(--card))] rounded-lg">
-              <div className="text-4xl mb-3">{item.icon}</div>
-              <h3 className="font-bold text-lg mb-2 text-[hsl(var(--foreground))]">{item.title}</h3>
-              <p className="text-[hsl(var(--muted-foreground))]">{item.description}</p>
+            <div key={idx} className="text-center p-6 lg:p-8 bg-[hsl(var(--card))] rounded-xl shadow-lg">
+              <div className="text-5xl lg:text-6xl mb-4">{item.icon}</div>
+              <h3 className="font-bold text-xl lg:text-2xl mb-3 text-[hsl(var(--foreground))]">{item.title}</h3>
+              <p className="text-[hsl(var(--muted-foreground))] text-lg">{item.description}</p>
             </div>
           ))}
         </div>
@@ -271,13 +271,45 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     case 'stats':
       const stats = block.props?.items || [];
       return (
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
           {stats.map((item: { value: string; label: string }, idx: number) => (
             <div key={idx} className="text-center p-6">
-              <div className="text-5xl md:text-6xl font-bold text-[hsl(var(--primary))] mb-2">
+              <div className="text-6xl md:text-7xl lg:text-8xl font-bold text-[hsl(var(--primary))] mb-3">
                 {item.value}
               </div>
-              <div className="text-[hsl(var(--muted-foreground))] text-lg">{item.label}</div>
+              <div className="text-[hsl(var(--muted-foreground))] text-xl lg:text-2xl">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      );
+    
+    case 'timeline':
+      const timelineItems = block.props?.items || [];
+      return (
+        <div className="space-y-6">
+          {timelineItems.map((item: { year: string; title: string; description: string }, idx: number) => (
+            <div key={idx} className="flex items-start gap-6">
+              <div className="flex-shrink-0 w-24 text-right">
+                <span className="text-2xl font-bold text-[hsl(var(--primary))]">{item.year}</span>
+              </div>
+              <div className="flex-shrink-0 w-4 h-4 mt-2 rounded-full bg-[hsl(var(--primary))]" />
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-[hsl(var(--foreground))] mb-1">{item.title}</h4>
+                <p className="text-[hsl(var(--muted-foreground))] text-lg">{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    
+    case 'list':
+      const listItems = block.props?.items || [];
+      return (
+        <div className="space-y-4">
+          {listItems.map((item: { icon: string; text: string }, idx: number) => (
+            <div key={idx} className="flex items-center gap-4 p-4 bg-[hsl(var(--card))] rounded-xl">
+              <span className="text-3xl">{item.icon}</span>
+              <span className="text-xl text-[hsl(var(--foreground))]">{item.text}</span>
             </div>
           ))}
         </div>
@@ -285,21 +317,21 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     
     case 'warn':
       return (
-        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center text-lg">
-          <span className="text-amber-500">⚠️ {block.content}</span>
+        <div className="p-6 bg-amber-500/10 border-2 border-amber-500/30 rounded-xl text-center">
+          <span className="text-amber-500 text-xl lg:text-2xl">⚠️ {block.content}</span>
         </div>
       );
     
     case 'def':
       return (
-        <div className="p-4 bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/30 rounded-lg text-center text-lg">
-          <span className="text-[hsl(var(--primary))]">ℹ️ {block.content}</span>
+        <div className="p-6 bg-[hsl(var(--primary))]/10 border-2 border-[hsl(var(--primary))]/30 rounded-xl text-center">
+          <span className="text-[hsl(var(--primary))] text-xl lg:text-2xl">ℹ️ {block.content}</span>
         </div>
       );
     
     case 'quote':
       return (
-        <blockquote className="text-xl md:text-2xl italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-6 py-2">
+        <blockquote className="text-2xl md:text-3xl lg:text-4xl italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-8 py-4">
           "{block.content}"
         </blockquote>
       );

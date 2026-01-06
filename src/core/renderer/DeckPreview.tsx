@@ -137,8 +137,7 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
     case 'text':
       return (
         <div 
-          className="prose prose-sm max-w-none"
-          style={{ color: 'hsl(var(--foreground))' }}
+          className="prose prose-sm max-w-none prose-headings:text-[hsl(var(--foreground))] prose-p:text-[hsl(var(--foreground))]"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(block.content) }}
         />
       );
@@ -168,8 +167,7 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
           {columns.map((col: string, idx: number) => (
             <div 
               key={idx}
-              className="p-2 bg-[hsl(var(--card))] rounded-lg text-xs prose prose-sm max-w-none overflow-hidden"
-              style={{ color: 'hsl(var(--foreground))' }}
+              className="p-2 bg-[hsl(var(--card))] rounded-lg text-xs prose prose-sm max-w-none overflow-hidden prose-headings:text-[hsl(var(--foreground))]"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(col) }}
             />
           ))}
@@ -200,6 +198,33 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
                 {item.value}
               </div>
               <div className="text-[hsl(var(--muted-foreground))] text-xs">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      );
+    
+    case 'timeline':
+      const timelineItems = block.props?.items || [];
+      return (
+        <div className="space-y-2">
+          {timelineItems.map((item: { year: string; title: string; description: string }, idx: number) => (
+            <div key={idx} className="flex items-start gap-2">
+              <div className="flex-shrink-0 text-xs font-bold text-[hsl(var(--primary))]">{item.year}</div>
+              <div className="flex-shrink-0 w-2 h-2 mt-1 rounded-full bg-[hsl(var(--primary))]" />
+              <div className="flex-1 text-xs text-[hsl(var(--foreground))]">{item.title}</div>
+            </div>
+          ))}
+        </div>
+      );
+    
+    case 'list':
+      const listItems = block.props?.items || [];
+      return (
+        <div className="space-y-1">
+          {listItems.map((item: { icon: string; text: string }, idx: number) => (
+            <div key={idx} className="flex items-center gap-2 text-xs">
+              <span>{item.icon}</span>
+              <span className="text-[hsl(var(--foreground))]">{item.text}</span>
             </div>
           ))}
         </div>
