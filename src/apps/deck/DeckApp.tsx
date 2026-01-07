@@ -109,8 +109,9 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
 
   // Reset slide when content changes significantly
   useEffect(() => {
-    if (currentSlide >= totalSlides && totalSlides > 0) {
-      setCurrentSlide(totalSlides - 1);
+    // With intro slide: valid range is 0..totalSlides
+    if (currentSlide > totalSlides && totalSlides >= 0) {
+      setCurrentSlide(totalSlides);
     }
   }, [totalSlides, currentSlide]);
 
