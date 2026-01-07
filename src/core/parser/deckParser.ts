@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code';
   content: string;
   props?: Record<string, any>;
 }
@@ -119,6 +119,8 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'bigtitle', pattern: /Bigtitle\[([^\]]+)\]/g },
     { type: 'timeline', pattern: /Timeline\[([\s\S]*?)\]/g },
     { type: 'list', pattern: /List\[([\s\S]*?)\]/g },
+    { type: 'video', pattern: /Video\[([^\]]+)\]/g },
+    { type: 'code', pattern: /Code\[([^;]+);([\s\S]*?)\]/g, hasLang: true },
   ];
   
   // Handle Column separately with balanced bracket matching
@@ -147,7 +149,7 @@ function parseSlideContent(content: string): SlideContent[] {
     });
   }
   
-  for (const { type, pattern } of blockPatterns) {
+  for (const { type, pattern, hasLang } of blockPatterns as Array<{ type: string; pattern: RegExp; hasLang?: boolean }>) {
     const regex = new RegExp(pattern.source, 'g');
     let match;
     while ((match = regex.exec(content)) !== null) {
@@ -156,14 +158,14 @@ function parseSlideContent(content: string): SlideContent[] {
         col => match!.index >= col.start && match!.index < col.end
       );
       if (overlapsColumn) continue;
-      
+
       const matchData: Match = {
         type,
-        content: match[1],
+        content: hasLang ? match[2] : match[1],
         start: match.index,
         end: match.index + match[0].length,
       };
-      
+
       // Parse specific content types
       if (type === 'feature') {
         matchData.props = { items: parseFeatureItems(match[1]) };
@@ -173,8 +175,10 @@ function parseSlideContent(content: string): SlideContent[] {
         matchData.props = { items: parseTimelineItems(match[1]) };
       } else if (type === 'list') {
         matchData.props = { items: parseListItems(match[1]) };
+      } else if (type === 'code') {
+        matchData.props = { lang: match[1].trim() };
       }
-      
+
       matches.push(matchData);
     }
   }

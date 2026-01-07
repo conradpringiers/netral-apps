@@ -269,6 +269,8 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
           ))}
         </div>
       );
+
+    case 'feature':
       const features = block.props?.items || [];
       return (
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -328,28 +330,46 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
           ))}
         </div>
       );
-    
+
+    case 'video':
+      return (
+        <div className="flex justify-center">
+          <video
+            src={block.content}
+            controls
+            className="max-h-[60vh] rounded-xl shadow-2xl"
+          />
+        </div>
+      );
+
+    case 'code':
+      return (
+        <pre className="overflow-auto rounded-xl p-6 bg-[hsl(var(--secondary))] text-[hsl(var(--foreground))] font-mono text-lg lg:text-xl">
+          <code>{block.content.trim()}</code>
+        </pre>
+      );
+
     case 'warn':
       return (
         <div className="p-6 bg-amber-500/10 border-2 border-amber-500/30 rounded-xl text-center">
           <span className="text-amber-500 text-xl lg:text-2xl">⚠️ {block.content}</span>
         </div>
       );
-    
+
     case 'def':
       return (
         <div className="p-6 bg-[hsl(var(--primary))]/10 border-2 border-[hsl(var(--primary))]/30 rounded-xl text-center">
           <span className="text-[hsl(var(--primary))] text-xl lg:text-2xl">ℹ️ {block.content}</span>
         </div>
       );
-    
+
     case 'quote':
       return (
         <blockquote className="text-2xl md:text-3xl lg:text-4xl italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-8 py-4">
           "{block.content}"
         </blockquote>
       );
-    
+
     default:
       return null;
   }
