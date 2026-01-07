@@ -182,6 +182,8 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
           ))}
         </div>
       );
+
+    case 'feature':
       const features = block.props?.items || [];
       return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -236,28 +238,48 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
           ))}
         </div>
       );
-    
+
+    case 'video':
+      return (
+        <div className="flex justify-center">
+          <video
+            src={block.content}
+            className="max-h-20 md:max-h-24 rounded-lg shadow-lg"
+            muted
+            loop
+            playsInline
+          />
+        </div>
+      );
+
+    case 'code':
+      return (
+        <pre className="overflow-auto rounded-lg p-2 bg-[hsl(var(--secondary))] text-[hsl(var(--foreground))] font-mono text-[10px]">
+          <code>{block.content.trim()}</code>
+        </pre>
+      );
+
     case 'warn':
       return (
         <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center text-xs">
           <span className="text-amber-500">⚠️ {block.content}</span>
         </div>
       );
-    
+
     case 'def':
       return (
         <div className="p-2 bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/30 rounded-lg text-center text-xs">
           <span className="text-[hsl(var(--primary))]">ℹ️ {block.content}</span>
         </div>
       );
-    
+
     case 'quote':
       return (
         <blockquote className="text-sm italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-3 py-1">
           "{block.content}"
         </blockquote>
       );
-    
+
     default:
       return null;
   }

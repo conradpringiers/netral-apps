@@ -106,8 +106,11 @@ const deckSyntaxReference = [
     icon: '🖼️',
     items: [
       { name: 'Image', syntax: 'Image[https://example.com/image.jpg]', description: 'Display an image on slide' },
+      { name: 'Video', syntax: 'Video[https://example.com/video.mp4]', description: 'Embed a video on slide' },
+      { name: 'Code', syntax: 'Code[js; const x = 1]', description: 'Code block with language' },
       { name: 'Bigtitle', syntax: 'Bigtitle[Large Text]', description: 'Large centered title' },
-      { name: 'Column', syntax: 'Column[\n{Left content}\n{Right content}\n]', description: 'Two-column layout' },
+      { name: 'Column', syntax: 'Column[\n{Left content}\n{Right content}\n]', description: 'Two-column layout (supports nested blocks)' },
+      { name: 'Logo', syntax: 'Logo[Text or URL]', description: 'Shows on all slides (top-right)' },
     ],
   },
   {
