@@ -19,6 +19,8 @@ export interface Slide {
 export interface DeckDocument {
   title: string;
   theme: ThemeName;
+  /** Optional logo shown on all slides */
+  logo?: string;
   slides: Slide[];
 }
 
@@ -27,14 +29,15 @@ export interface DeckDocument {
  */
 export function parseDeckDocument(input: string): DeckDocument {
   const lines = input.split('\n');
-  
+
   let title = 'Présentation';
   let theme: ThemeName = 'Modern';
+  let logo: string | undefined;
   const slides: Slide[] = [];
-  
+
   let currentSlide: Slide | null = null;
   let contentBuffer: string[] = [];
-  
+
   const flushContent = () => {
     if (currentSlide && contentBuffer.length > 0) {
       const rawContent = contentBuffer.join('\n').trim();
@@ -45,24 +48,31 @@ export function parseDeckDocument(input: string): DeckDocument {
       contentBuffer = [];
     }
   };
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.trim();
-    
+
     // Document title: --- Title
     if (trimmedLine.startsWith('---')) {
       title = trimmedLine.replace(/^---\s*/, '').trim() || 'Présentation';
       continue;
     }
-    
+
+    // Logo: Logo[Text or URL]
+    const logoMatch = trimmedLine.match(/^Logo\[([\s\S]+)\]$/);
+    if (logoMatch && !currentSlide) {
+      logo = logoMatch[1].trim();
+      continue;
+    }
+
     // Theme: Theme[Name]
     const themeMatch = trimmedLine.match(/^Theme\[([^\]]+)\]$/);
     if (themeMatch) {
       theme = themeMatch[1] as ThemeName;
       continue;
     }
-    
+
     // Slide title: -- Slide Title
     if (trimmedLine.startsWith('--') && !trimmedLine.startsWith('---')) {
       flushContent();
@@ -75,20 +85,20 @@ export function parseDeckDocument(input: string): DeckDocument {
       };
       continue;
     }
-    
+
     // Add line to content buffer if we're in a slide
     if (currentSlide) {
       contentBuffer.push(line);
     }
   }
-  
+
   // Flush remaining content
   flushContent();
   if (currentSlide) {
     slides.push(currentSlide);
   }
-  
-  return { title, theme, slides };
+
+  return { title, theme, logo, slides };
 }
 
 /**
@@ -132,6 +142,7 @@ function parseSlideContent(content: string): SlideContent[] {
       content: colMatch.content,
       start: colMatch.start,
       end: colMatch.end,
+      // Each column is parsed like normal slide content, so it can include Image[], Warn[], etc.
       props: { columns: parseColumnContent(colMatch.content) },
     });
   }
@@ -202,47 +213,44 @@ function parseSlideContent(content: string): SlideContent[] {
   return elements;
 }
 
-function parseColumnContent(content: string): string[] {
-  const columns: string[] = [];
-  // Match content between { and }, allowing for nested content
+function parseColumnContent(content: string): SlideContent[][] {
+  const columns: SlideContent[][] = [];
+
+  // Extract top-level { ... } blocks (supports nested braces inside)
   let depth = 0;
-  let currentColumn = '';
+  let current = '';
   let inColumn = false;
-  
+
   for (let i = 0; i < content.length; i++) {
     const char = content[i];
-    
+
     if (char === '{') {
       if (depth === 0) {
         inColumn = true;
-        currentColumn = '';
+        current = '';
       } else {
-        currentColumn += char;
+        current += char;
       }
       depth++;
-    } else if (char === '}') {
+      continue;
+    }
+
+    if (char === '}') {
       depth--;
       if (depth === 0 && inColumn) {
-        // Strip out any block elements - columns only allow text/markdown
-        let columnText = currentColumn.trim();
-        // Remove Image[], Warn[], Def[], Feature[], Stats[], etc.
-        columnText = columnText.replace(/Image\[[^\]]*\]/g, '');
-        columnText = columnText.replace(/Warn\[[^\]]*\]/g, '');
-        columnText = columnText.replace(/Def\[[^\]]*\]/g, '');
-        columnText = columnText.replace(/Feature\[[\s\S]*?\]/g, '');
-        columnText = columnText.replace(/Stats\[[\s\S]*?\]/g, '');
-        columnText = columnText.replace(/Bigtitle\[[^\]]*\]/g, '');
-        columnText = columnText.replace(/quote\[[^\]]*\]/g, '');
-        columns.push(columnText.trim());
+        const raw = current.trim();
+        columns.push(raw ? parseSlideContent(raw) : []);
         inColumn = false;
-      } else {
-        currentColumn += char;
+        continue;
       }
-    } else if (inColumn) {
-      currentColumn += char;
+      // nested closing brace
+      if (inColumn) current += char;
+      continue;
     }
+
+    if (inColumn) current += char;
   }
-  
+
   return columns;
 }
 

@@ -64,7 +64,8 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
               fontFamily: theme.fontFamily,
             } as React.CSSProperties}
           >
-            <div className="deck-preview-slide h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center justify-center">
+            <div className="deck-preview-slide relative h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center justify-center">
+              <DeckLogo logo={doc.logo} />
               <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center text-[hsl(var(--primary))] px-6">
                 {doc.title}
               </h1>
@@ -102,7 +103,8 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
                 fontFamily: theme.fontFamily,
               } as React.CSSProperties}
             >
-              <div className="deck-preview-slide h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
+              <div className="deck-preview-slide relative h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
+                <DeckLogo logo={doc.logo} />
                 {/* Slide title at top left */}
                 <div className="px-4 pt-3 pb-2 border-b border-[hsl(var(--border))]">
                   <h1 className="text-base md:text-xl font-bold text-[hsl(var(--foreground))]">
@@ -136,45 +138,50 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
     case 'markdown':
     case 'text':
       return (
-        <div 
-          className="prose prose-sm max-w-none prose-headings:text-[hsl(var(--foreground))] prose-p:text-[hsl(var(--foreground))]"
+        <div
+          className="text-[hsl(var(--foreground))] leading-snug
+            [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mt-3 [&_h1]:mb-1.5
+            [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-2.5 [&_h2]:mb-1
+            [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1
+            [&_p]:text-xs [&_ul]:text-xs [&_ol]:text-xs [&_li]:text-xs
+            [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(block.content) }}
         />
       );
-    
+
     case 'bigtitle':
       return (
         <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-center text-[hsl(var(--primary))]">
           {block.content}
         </h2>
       );
-    
+
     case 'image':
       return (
         <div className="flex justify-center">
-          <img 
-            src={block.content} 
-            alt="Slide image" 
+          <img
+            src={block.content}
+            alt="Slide image"
             className="max-h-24 md:max-h-32 rounded-lg shadow-lg object-contain"
           />
         </div>
       );
-    
+
     case 'column':
-      const columns = block.props?.columns || [];
+      const columns = (block.props?.columns || []) as SlideContent[][];
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {columns.map((col: string, idx: number) => (
-            <div 
-              key={idx}
-              className="p-2 bg-[hsl(var(--card))] rounded-lg text-xs prose prose-sm max-w-none overflow-hidden prose-headings:text-[hsl(var(--foreground))]"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(col) }}
-            />
+          {columns.map((colBlocks, idx) => (
+            <div key={idx} className="p-2 bg-[hsl(var(--card))] rounded-lg text-[10px] overflow-hidden">
+              <div className="space-y-1">
+                {colBlocks.map((child, childIdx) => (
+                  <PreviewSlideBlock key={childIdx} block={child} />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       );
-    
-    case 'feature':
       const features = block.props?.items || [];
       return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -254,6 +261,32 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
     default:
       return null;
   }
+
+}
+
+function isProbablyUrl(value: string) {
+  return /^(https?:\/\/|data:image\/)/i.test(value.trim());
+}
+
+function DeckLogo({ logo }: { logo?: string }) {
+  if (!logo) return null;
+
+  return (
+    <div className="absolute top-3 right-4 z-10">
+      {isProbablyUrl(logo) ? (
+        <img
+          src={logo}
+          alt="Logo"
+          className="h-6 md:h-7 w-auto object-contain"
+          loading="lazy"
+        />
+      ) : (
+        <div className="text-white/80 font-semibold text-sm">
+          {logo}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default DeckPreview;
