@@ -9,6 +9,7 @@ import { NetralRenderer } from '@/core/renderer/NetralRenderer';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
+import { TemplatesModal } from '@/shared/components/TemplatesModal';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { downloadHtml } from '@/core/exporter/htmlExporter';
 import { toast } from '@/hooks/use-toast';
@@ -186,6 +187,7 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
             onLoad={handleLoadFile}
             fileExtension=".netblock"
           />
+          <TemplatesModal mode="block" onSelect={handleLoadFile} />
         </div>
 
         <div className="flex items-center gap-2">

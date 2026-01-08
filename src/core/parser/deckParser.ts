@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery';
   content: string;
   props?: Record<string, any>;
 }
@@ -121,6 +121,8 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'list', pattern: /List\[([\s\S]*?)\]/g },
     { type: 'video', pattern: /Video\[([^\]]+)\]/g },
     { type: 'code', pattern: /Code\[([^;]+);([\s\S]*?)\]/g, hasLang: true },
+    { type: 'badge', pattern: /Badge\[([^\]]+)\]/g },
+    { type: 'gallery', pattern: /Gallery\[([\s\S]*?)\]/g },
   ];
   
   // Handle Column separately with balanced bracket matching
@@ -177,6 +179,8 @@ function parseSlideContent(content: string): SlideContent[] {
         matchData.props = { items: parseListItems(match[1]) };
       } else if (type === 'code') {
         matchData.props = { lang: match[1].trim() };
+      } else if (type === 'gallery') {
+        matchData.props = { items: parseGalleryItems(match[1]) };
       }
 
       matches.push(matchData);
@@ -333,6 +337,18 @@ function parseListItems(content: string): { icon: string; text: string }[] {
     items.push({
       icon: match[1].trim(),
       text: match[2].trim(),
+    });
+  }
+  return items;
+}
+
+function parseGalleryItems(content: string): { url: string; caption: string }[] {
+  const items: { url: string; caption: string }[] = [];
+  const matches = content.matchAll(/\{([^;]+);([^}]+)\}/g);
+  for (const match of matches) {
+    items.push({
+      url: match[1].trim(),
+      caption: match[2].trim(),
     });
   }
   return items;

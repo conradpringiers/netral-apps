@@ -113,8 +113,8 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
                 </div>
                 
                 {/* Slide content */}
-                <div className="flex-1 flex flex-col items-center justify-center p-3 md:p-4 overflow-hidden min-h-0">
-                  <div className="w-full max-w-3xl space-y-2 md:space-y-3">
+                <div className="flex-1 p-3 md:p-4 overflow-hidden min-h-0">
+                  <div className="w-full max-w-3xl mx-auto space-y-2 md:space-y-3">
                     {slide.content.map((block, blockIndex) => (
                       <PreviewSlideBlock key={blockIndex} block={block} />
                     ))}
@@ -170,9 +170,9 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
     case 'column':
       const columns = (block.props?.columns || []) as SlideContent[][];
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
           {columns.map((colBlocks, idx) => (
-            <div key={idx} className="p-2 bg-[hsl(var(--card))] rounded-lg text-[10px] overflow-hidden">
+            <div key={idx} className="p-1.5 bg-[hsl(var(--card))] rounded text-[10px] overflow-hidden">
               <div className="space-y-1">
                 {colBlocks.map((child, childIdx) => (
                   <PreviewSlideBlock key={childIdx} block={child} />
@@ -278,6 +278,29 @@ function PreviewSlideBlock({ block }: { block: SlideContent }) {
         <blockquote className="text-sm italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-3 py-1">
           "{block.content}"
         </blockquote>
+      );
+
+    case 'badge':
+      return (
+        <span className="inline-block px-2 py-0.5 rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-semibold text-[9px]">
+          {block.content}
+        </span>
+      );
+
+    case 'gallery':
+      const galleryItems = block.props?.items || [];
+      return (
+        <div className="grid grid-cols-3 gap-1">
+          {galleryItems.slice(0, 6).map((item: { url: string; caption: string }, idx: number) => (
+            <div key={idx}>
+              <img
+                src={item.url}
+                alt={item.caption}
+                className="w-full aspect-video object-cover rounded"
+              />
+            </div>
+          ))}
+        </div>
       );
 
     default:
