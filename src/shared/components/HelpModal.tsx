@@ -121,6 +121,8 @@ const deckSyntaxReference = [
       { name: 'Stats', syntax: 'Stats[\n{100+;Clients}\n{50K;Downloads}\n]', description: 'Key statistics display' },
       { name: 'Timeline', syntax: 'Timeline[\n{2024;Event;Description}\n]', description: 'Chronological events' },
       { name: 'List', syntax: 'List[\n{✅;Completed task}\n{🔜;Coming soon}\n]', description: 'Icon list items' },
+      { name: 'Badge', syntax: 'Badge[Label]', description: 'Colored badge/tag' },
+      { name: 'Gallery', syntax: 'Gallery[\n{url;caption}\n]', description: 'Image grid with captions' },
     ],
   },
   {

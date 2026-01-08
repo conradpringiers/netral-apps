@@ -199,13 +199,13 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
            </div>
            
            {/* Slide content - centered and responsive */}
-           <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-auto">
-             <div className="w-full max-w-5xl space-y-6">
-               {slide.content.map((block, index) => (
-                 <FullscreenSlideBlock key={index} block={block} />
-               ))}
-             </div>
-           </div>
+          <div className="flex-1 p-8 overflow-auto">
+              <div className="w-full max-w-5xl mx-auto space-y-6">
+                {slide.content.map((block, index) => (
+                  <FullscreenSlideBlock key={index} block={block} />
+                ))}
+              </div>
+            </div>
          </div>
        ) : null}
     </div>
@@ -254,13 +254,13 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
     case 'column':
       const columns = (block.props?.columns || []) as SlideContent[][];
       return (
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid md:grid-cols-2 gap-4">
           {columns.map((colBlocks, idx) => (
             <div
               key={idx}
-              className="p-6 lg:p-8 bg-[hsl(var(--card))] rounded-xl overflow-hidden"
+              className="p-4 bg-[hsl(var(--card))] rounded-xl overflow-hidden"
             >
-              <div className="space-y-5">
+              <div className="space-y-3">
                 {colBlocks.map((child, childIdx) => (
                   <FullscreenSlideBlock key={childIdx} block={child} />
                 ))}
@@ -368,6 +368,30 @@ function FullscreenSlideBlock({ block }: { block: SlideContent }) {
         <blockquote className="text-2xl md:text-3xl lg:text-4xl italic text-center text-[hsl(var(--muted-foreground))] border-l-4 border-[hsl(var(--primary))] pl-8 py-4">
           "{block.content}"
         </blockquote>
+      );
+
+    case 'badge':
+      return (
+        <div className="inline-block px-4 py-2 rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-semibold text-lg">
+          {block.content}
+        </div>
+      );
+
+    case 'gallery':
+      const galleryItems = block.props?.items || [];
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {galleryItems.map((item: { url: string; caption: string }, idx: number) => (
+            <div key={idx} className="text-center">
+              <img
+                src={item.url}
+                alt={item.caption}
+                className="w-full aspect-video object-cover rounded-lg shadow-lg mb-2"
+              />
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">{item.caption}</p>
+            </div>
+          ))}
+        </div>
       );
 
     default:

@@ -10,6 +10,7 @@ import { PresentationMode } from '@/core/renderer/PresentationMode';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
+import { TemplatesModal } from '@/shared/components/TemplatesModal';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { parseDeckDocument, getDefaultDeckContent } from '@/core/parser/deckParser';
 import { toast } from '@/hooks/use-toast';
@@ -148,6 +149,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             onLoad={handleLoad}
             fileExtension=".netdeck"
           />
+          <TemplatesModal mode="deck" onSelect={handleLoad} />
         </div>
 
         <div className="flex items-center gap-2">
