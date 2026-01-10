@@ -101,16 +101,17 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
             >
               <div className="deck-preview-slide relative h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
                 <DeckLogo logo={doc.logo} />
-                {/* Slide title */}
-                <div className="px-4 pt-3 pb-2">
+                {/* Slide title with separator */}
+                <div className="px-4 pt-3 pb-1">
                   <h1 className="text-sm md:text-base font-bold text-[hsl(var(--foreground))]">
                     {slide.title}
                   </h1>
+                  <hr className="mt-1.5 border-t border-[hsl(var(--border))]" />
                 </div>
                 
                 {/* Slide content */}
                 <div className="flex-1 px-4 pb-3 overflow-hidden min-h-0">
-                  <div className="w-full max-w-3xl space-y-1.5">
+                  <div className="w-full space-y-2">
                     {slide.content.map((block, blockIndex) => (
                       <SlideBlockRenderer key={blockIndex} block={block} scale="preview" />
                     ))}
