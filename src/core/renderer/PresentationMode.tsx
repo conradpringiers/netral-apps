@@ -143,8 +143,8 @@ export function PresentationMode({
         className={`h-full w-full transition-all duration-300 ease-out ${
           isTransitioning
             ? slideDirection === 'right'
-              ? 'opacity-0 translate-x-4'
-              : 'opacity-0 -translate-x-4'
+              ? 'opacity-80 translate-x-3'
+              : 'opacity-80 -translate-x-3'
             : 'opacity-100 translate-x-0'
         }`}
       >
