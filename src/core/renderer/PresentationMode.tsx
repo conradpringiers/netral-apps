@@ -203,10 +203,10 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
           </p>
         </div>
       ) : slide ? (
-        <div className="fullscreen-slide relative h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
+        <div className="fullscreen-slide relative h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center">
           <DeckLogo logo={doc.logo} />
           {/* Slide title with separator */}
-          <div className="px-12 pt-10 pb-6">
+          <div className="w-full max-w-7xl px-12 pt-10 pb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))]">
               {slide.title}
             </h1>
@@ -214,8 +214,8 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
           </div>
           
           {/* Slide content */}
-          <div className="flex-1 px-12 pb-10 overflow-auto">
-            <div className="w-full max-w-6xl space-y-6">
+          <div className="flex-1 w-full max-w-7xl px-12 pb-10 overflow-auto">
+            <div className="w-full space-y-6">
               {slide.content.map((block, index) => (
                 <SlideBlockRenderer key={index} block={block} scale="fullscreen" />
               ))}
