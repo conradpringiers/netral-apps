@@ -123,6 +123,8 @@ const deckSyntaxReference = [
       { name: 'List', syntax: 'List[\n{✅;Completed task}\n{🔜;Coming soon}\n]', description: 'Icon list items' },
       { name: 'Badge', syntax: 'Badge[Label]', description: 'Colored badge/tag' },
       { name: 'Gallery', syntax: 'Gallery[\n{url;caption}\n]', description: 'Image grid with captions' },
+      { name: 'Progress', syntax: 'Progress[75;Loading...]', description: 'Progress bar with percentage' },
+      { name: 'Graph', syntax: 'Graph[\n{a;Start;->b}\n{b;End}\n]', description: 'Simple flowchart nodes' },
     ],
   },
   {

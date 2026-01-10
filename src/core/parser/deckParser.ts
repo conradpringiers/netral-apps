@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph';
   content: string;
   props?: Record<string, any>;
 }
@@ -123,6 +123,8 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'code', pattern: /Code\[([^;]+);([\s\S]*?)\]/g, hasLang: true },
     { type: 'badge', pattern: /Badge\[([^\]]+)\]/g },
     { type: 'gallery', pattern: /Gallery\[([\s\S]*?)\]/g },
+    { type: 'progress', pattern: /Progress\[([^\]]+)\]/g },
+    { type: 'graph', pattern: /Graph\[([\s\S]*?)\]/g },
   ];
   
   // Handle Column separately with balanced bracket matching
@@ -181,6 +183,10 @@ function parseSlideContent(content: string): SlideContent[] {
         matchData.props = { lang: match[1].trim() };
       } else if (type === 'gallery') {
         matchData.props = { items: parseGalleryItems(match[1]) };
+      } else if (type === 'progress') {
+        matchData.props = parseProgressContent(match[1]);
+      } else if (type === 'graph') {
+        matchData.props = { nodes: parseGraphNodes(match[1]) };
       }
 
       matches.push(matchData);
@@ -352,6 +358,27 @@ function parseGalleryItems(content: string): { url: string; caption: string }[] 
     });
   }
   return items;
+}
+
+function parseProgressContent(content: string): { value: number; label?: string } {
+  const parts = content.split(';').map(s => s.trim());
+  const value = parseInt(parts[0], 10) || 0;
+  const label = parts[1] || undefined;
+  return { value: Math.min(100, Math.max(0, value)), label };
+}
+
+function parseGraphNodes(content: string): { id: string; label: string; connections: string[] }[] {
+  const nodes: { id: string; label: string; connections: string[] }[] = [];
+  // Format: {id;label;->target1,target2}
+  const matches = content.matchAll(/\{([^;]+);([^;]+)(?:;->([^}]*))?\}/g);
+  for (const match of matches) {
+    nodes.push({
+      id: match[1].trim(),
+      label: match[2].trim(),
+      connections: match[3] ? match[3].split(',').map(s => s.trim()) : [],
+    });
+  }
+  return nodes;
 }
 
 /**

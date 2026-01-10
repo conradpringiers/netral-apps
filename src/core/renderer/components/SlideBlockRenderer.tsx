@@ -220,6 +220,46 @@ export function SlideBlockRenderer({ block, scale = 'fullscreen' }: SlideBlockRe
         </div>
       );
 
+    case 'progress':
+      const progressValue = block.props?.value || 0;
+      const progressLabel = block.props?.label;
+      return (
+        <div className={`w-full ${sizes.space}`}>
+          <div className="flex justify-between items-center mb-1">
+            {progressLabel && (
+              <span className={`${sizes.text} text-[hsl(var(--foreground))]`}>{progressLabel}</span>
+            )}
+            <span className={`${sizes.text} text-[hsl(var(--muted-foreground))] ml-auto`}>{progressValue}%</span>
+          </div>
+          <div className={`w-full ${isPreview ? 'h-2' : 'h-3'} bg-[hsl(var(--muted))] ${sizes.rounded} overflow-hidden`}>
+            <div 
+              className={`h-full bg-[hsl(var(--primary))] ${sizes.rounded} transition-all duration-500`}
+              style={{ width: `${progressValue}%` }}
+            />
+          </div>
+        </div>
+      );
+
+    case 'graph':
+      const graphNodes = block.props?.nodes || [];
+      return (
+        <div className={`flex items-center justify-center ${sizes.gap} flex-wrap py-4`}>
+          {graphNodes.map((node: { id: string; label: string; connections: string[] }, idx: number) => (
+            <div key={node.id} className="flex items-center">
+              <div className={`${isPreview ? 'px-2 py-1 text-[10px]' : 'px-4 py-2 text-sm'} rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-medium shadow-md`}>
+                {node.label}
+              </div>
+              {node.connections.length > 0 && idx < graphNodes.length - 1 && (
+                <div className={`${isPreview ? 'mx-1' : 'mx-3'} flex items-center text-[hsl(var(--muted-foreground))]`}>
+                  <div className={`${isPreview ? 'w-4' : 'w-8'} h-0.5 bg-[hsl(var(--border))]`} />
+                  <span className={isPreview ? 'text-xs' : 'text-lg'}>→</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+
     default:
       return null;
   }
