@@ -1,10 +1,10 @@
 /**
  * Presentation Mode
- * Fullscreen presentation with keyboard navigation
+ * Fullscreen presentation with keyboard navigation and smooth transitions
  */
 
-import { useEffect, useCallback, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { parseDeckDocument } from '../parser/deckParser';
 import { getTheme, generateThemeCSS } from '../themes/themes';
 import { SlideBlockRenderer } from './components/SlideBlockRenderer';
@@ -24,17 +24,31 @@ export function PresentationMode({
   onSlideChange,
   onClose,
 }: PresentationModeProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const goToPrevSlide = useCallback(() => {
-    if (currentSlide > 0) {
-      onSlideChange(currentSlide - 1);
+    if (currentSlide > 0 && !isTransitioning) {
+      setSlideDirection('left');
+      setIsTransitioning(true);
+      setTimeout(() => {
+        onSlideChange(currentSlide - 1);
+        setIsTransitioning(false);
+      }, 150);
     }
-  }, [currentSlide, onSlideChange]);
+  }, [currentSlide, onSlideChange, isTransitioning]);
 
   const goToNextSlide = useCallback(() => {
-    if (currentSlide < totalSlides) {
-      onSlideChange(currentSlide + 1);
+    if (currentSlide < totalSlides && !isTransitioning) {
+      setSlideDirection('right');
+      setIsTransitioning(true);
+      setTimeout(() => {
+        onSlideChange(currentSlide + 1);
+        setIsTransitioning(false);
+      }, 150);
     }
-  }, [currentSlide, totalSlides, onSlideChange]);
+  }, [currentSlide, totalSlides, onSlideChange, isTransitioning]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -88,41 +102,54 @@ export function PresentationMode({
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-50 p-2 text-white/50 hover:text-white transition-colors"
-        title="Close (Escape)"
+      {/* Navigation pill - bottom left */}
+      <div
+        className="absolute bottom-6 left-6 z-50 flex items-center bg-white/10 backdrop-blur-sm rounded-full transition-all duration-300"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <X className="h-6 w-6" />
-      </button>
+        {/* Left arrow - visible on hover */}
+        <button
+          onClick={goToPrevSlide}
+          disabled={currentSlide === 0}
+          className={`p-2 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 ${
+            isHovered ? 'opacity-100 w-8' : 'opacity-0 w-0 overflow-hidden'
+          }`}
+          title="Previous slide (←)"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
 
-      {/* Navigation buttons */}
-      <button
-        onClick={goToPrevSlide}
-        disabled={currentSlide === 0}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/30 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        title="Previous slide (←)"
-      >
-        <ChevronLeft className="h-10 w-10" />
-      </button>
+        {/* Slide number */}
+        <span className="px-3 py-2 text-white/80 text-sm font-medium min-w-[3rem] text-center">
+          {currentSlide === 0 ? 'Intro' : `${currentSlide}/${totalSlides}`}
+        </span>
 
-      <button
-        onClick={goToNextSlide}
-        disabled={currentSlide === totalSlides}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-3 text-white/30 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        title="Next slide (→)"
-      >
-        <ChevronRight className="h-10 w-10" />
-      </button>
-
-      {/* Slide counter */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 text-white/50 text-sm">
-        {currentSlide === 0 ? 'Intro' : `${currentSlide} / ${totalSlides}`}
+        {/* Right arrow - visible on hover */}
+        <button
+          onClick={goToNextSlide}
+          disabled={currentSlide === totalSlides}
+          className={`p-2 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 ${
+            isHovered ? 'opacity-100 w-8' : 'opacity-0 w-0 overflow-hidden'
+          }`}
+          title="Next slide (→)"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Slide content */}
-      <FullscreenSlide content={content} currentSlide={currentSlide} />
+      {/* Slide content with transition */}
+      <div
+        className={`h-full w-full transition-all duration-300 ease-out ${
+          isTransitioning
+            ? slideDirection === 'right'
+              ? 'opacity-0 translate-x-4'
+              : 'opacity-0 -translate-x-4'
+            : 'opacity-100 translate-x-0'
+        }`}
+      >
+        <FullscreenSlide content={content} currentSlide={currentSlide} />
+      </div>
     </div>
   );
 }
@@ -178,16 +205,17 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
       ) : slide ? (
         <div className="fullscreen-slide relative h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
           <DeckLogo logo={doc.logo} />
-          {/* Slide title */}
-          <div className="px-12 pt-8 pb-4">
+          {/* Slide title with separator */}
+          <div className="px-12 pt-10 pb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))]">
               {slide.title}
             </h1>
+            <hr className="mt-4 border-t border-[hsl(var(--border))]" />
           </div>
           
           {/* Slide content */}
-          <div className="flex-1 px-12 pb-8 overflow-auto">
-            <div className="w-full max-w-5xl space-y-4">
+          <div className="flex-1 px-12 pb-10 overflow-auto">
+            <div className="w-full max-w-6xl space-y-6">
               {slide.content.map((block, index) => (
                 <SlideBlockRenderer key={index} block={block} scale="fullscreen" />
               ))}
