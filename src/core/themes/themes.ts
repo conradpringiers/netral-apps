@@ -12,7 +12,9 @@ export type ThemeName =
   | 'Ocean'
   | 'Solarized'
   | 'Midnight'
-  | 'Minimal';
+  | 'Minimal'
+  | 'Sunset'
+  | 'Neon';
 
 export interface ThemeColors {
   background: string;
@@ -247,6 +249,52 @@ export const themes: Record<ThemeName, Theme> = {
     },
     fontFamily: "'Inter', system-ui, sans-serif",
     borderRadius: '0',
+  },
+  'Sunset': {
+    name: 'Sunset',
+    colors: {
+      background: '20 30% 98%',
+      foreground: '15 25% 15%',
+      primary: '15 85% 55%',
+      primaryForeground: '0 0% 100%',
+      secondary: '30 40% 92%',
+      secondaryForeground: '15 25% 15%',
+      muted: '25 25% 94%',
+      mutedForeground: '15 15% 45%',
+      accent: '350 70% 55%',
+      accentForeground: '0 0% 100%',
+      border: '25 20% 85%',
+      card: '20 30% 99%',
+      cardForeground: '15 25% 15%',
+      warning: '45 100% 50%',
+      info: '15 85% 55%',
+      success: '142 60% 45%',
+    },
+    fontFamily: "'Inter', system-ui, sans-serif",
+    borderRadius: '0.75rem',
+  },
+  'Neon': {
+    name: 'Neon',
+    colors: {
+      background: '270 15% 8%',
+      foreground: '280 100% 95%',
+      primary: '320 100% 60%',
+      primaryForeground: '270 15% 8%',
+      secondary: '270 20% 15%',
+      secondaryForeground: '280 100% 95%',
+      muted: '270 15% 18%',
+      mutedForeground: '280 50% 70%',
+      accent: '180 100% 50%',
+      accentForeground: '270 15% 8%',
+      border: '270 30% 25%',
+      card: '270 15% 10%',
+      cardForeground: '280 100% 95%',
+      warning: '60 100% 50%',
+      info: '180 100% 50%',
+      success: '120 100% 50%',
+    },
+    fontFamily: "'Inter', system-ui, sans-serif",
+    borderRadius: '0.5rem',
   },
 };
 
