@@ -11,8 +11,10 @@ import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
 import { TemplatesModal } from '@/shared/components/TemplatesModal';
+import { ThemeSelector } from '@/shared/components/ThemeSelector';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
 import { parseDeckDocument, getDefaultDeckContent } from '@/core/parser/deckParser';
+import { ThemeName } from '@/core/themes/themes';
 import { toast } from '@/hooks/use-toast';
 import { Presentation, Play, Eye, Code2, PanelLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,6 +54,22 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
   
   const totalSlides = doc?.slides.length || 0;
   const documentTitle = doc?.title || 'Presentation';
+  const currentTheme = (doc?.theme || 'Modern') as ThemeName;
+  
+  const handleThemeChange = useCallback((theme: ThemeName) => {
+    if (content.match(/^Theme\[.+\]$/im)) {
+      setContent(content.replace(/^Theme\[.+\]$/im, `Theme[${theme}]`));
+    } else {
+      const lines = content.split('\n');
+      const titleIndex = lines.findIndex(line => line.match(/^---\s*.+$/));
+      if (titleIndex >= 0) {
+        lines.splice(titleIndex + 1, 0, `Theme[${theme}]`);
+        setContent(lines.join('\n'));
+      } else {
+        setContent(`Theme[${theme}]\n${content}`);
+      }
+    }
+  }, [content]);
 
   // Editor action handlers
   const handleInsert = useCallback((text: string) => {
@@ -150,6 +168,7 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             fileExtension=".netdeck"
           />
           <TemplatesModal mode="deck" onSelect={handleLoad} />
+          <ThemeSelector currentTheme={currentTheme} onThemeChange={handleThemeChange} />
         </div>
 
         <div className="flex items-center gap-2">

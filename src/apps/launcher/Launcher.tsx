@@ -6,7 +6,7 @@
 import { useRef, useState } from 'react';
 import { Layers, Presentation, Upload, FileText } from 'lucide-react';
 
-export type NetralMode = 'block' | 'deck' | null;
+export type NetralMode = 'block' | 'deck' | 'doc' | null;
 
 interface LauncherProps {
   onSelectMode: (mode: NetralMode, content?: string) => void;
@@ -27,6 +27,13 @@ const tools = [
     icon: Presentation,
     color: 'bg-purple-500',
   },
+  {
+    id: 'doc' as const,
+    name: 'Netral Doc',
+    description: 'Create beautiful documents with PDF export',
+    icon: FileText,
+    color: 'bg-emerald-500',
+  },
 ];
 
 export function Launcher({ onSelectMode }: LauncherProps) {
@@ -40,6 +47,8 @@ export function Launcher({ onSelectMode }: LauncherProps) {
       const ext = file.name.split('.').pop()?.toLowerCase();
       if (ext === 'netdeck') {
         onSelectMode('deck', content);
+      } else if (ext === 'netdoc') {
+        onSelectMode('doc', content);
       } else {
         onSelectMode('block', content);
       }
@@ -87,7 +96,7 @@ export function Launcher({ onSelectMode }: LauncherProps) {
         </div>
 
         {/* Tools Grid */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+        <div className="grid sm:grid-cols-3 gap-4 mb-6">
           {tools.map((tool) => (
             <button
               key={tool.id}
@@ -110,7 +119,7 @@ export function Launcher({ onSelectMode }: LauncherProps) {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".netblock,.netdeck,.txt"
+          accept=".netblock,.netdeck,.netdoc,.txt"
           onChange={handleFileInput}
           className="hidden"
         />
@@ -139,7 +148,7 @@ export function Launcher({ onSelectMode }: LauncherProps) {
                 {isDragOver ? 'Drop file here' : 'Drop a file or click to open'}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                .netblock or .netdeck
+                .netblock, .netdeck, or .netdoc
               </p>
             </div>
           </div>
