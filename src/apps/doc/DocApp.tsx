@@ -1,21 +1,18 @@
 /**
- * Netral Block Application
- * Main application component for the Netral editor
+ * Netral Doc Application
+ * Document editor with PDF export
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Editor, getEditorMethods } from '@/components/Editor';
-import { NetralRenderer } from '@/core/renderer/NetralRenderer';
+import { DocRenderer } from '@/core/renderer/DocRenderer';
 import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
-import { TemplatesModal } from '@/shared/components/TemplatesModal';
-import { ThemeSelector } from '@/shared/components/ThemeSelector';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
-import { downloadHtml } from '@/core/exporter/htmlExporter';
-import { ThemeName } from '@/core/themes/themes';
+import { parseDocDocument, getDefaultDocContent } from '@/core/parser/docParser';
 import { toast } from '@/hooks/use-toast';
-import { Layers, Download, Eye, Code2, PanelLeft, ArrowLeft } from 'lucide-react';
+import { FileText, Download, Eye, Code2, PanelLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   ResizablePanelGroup,
@@ -28,117 +25,29 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// Default content to showcase the new syntax
-const DEFAULT_CONTENT = `--- My Netral Site
-Theme[Modern]
-Logo[Netral]
-Navbar[
-{Home;#home}
-{Features;#features}
-{Pricing;#pricing}
-{Contact;#contact}
-]
-Header[BigText;Create websites with simple syntax;Netral lets you build beautiful web pages using intuitive syntax, no complex code required.;https://picsum.photos/1200/600;#features]
-
--- Features
-Bigtitle[Everything you need]
-
-Feature[
-{🚀;Fast;Create pages in minutes with our intuitive syntax}
-{🎨;Themes;9 professional themes ready to use}
-{📱;Responsive;All pages automatically adapt to mobile}
-]
-
-Stats[
-{100+;Users}
-{50K;Pages Created}
-{99%;Satisfaction}
-]
-
-Def[Netral uses a Markdown-inspired syntax extended for the modern web.]
-
--- Rich Content
-
-You can write **bold text**, *italic*, and even create lists:
-
-- First item
-- Second item
-- Third item
-
-Column[
-{The left column can contain explanatory text about your product or service.}
-{The right column can present complementary information or important details.}
-]
-
-Image[https://picsum.photos/800/400]
-
--- Testimonials
-
-Testimonial[
-{Marie Dupont;CEO at TechCorp;Netral transformed how we create web content;https://i.pravatar.cc/100?img=1}
-{John Martin;Designer;An intuitive interface that boosts my productivity;https://i.pravatar.cc/100?img=2}
-]
-
-FAQ[
-{What is Netral?;Netral is a simple syntax for creating beautiful websites without coding.}
-{How do I get started?;Just start typing in the editor - use element names + Tab to insert templates.}
-{Can I export my site?;Yes! Click the Export button to download a standalone HTML file.}
-]
-
-CTA[Ready to get started?;Join thousands of users creating beautiful websites;Get Started Free;#signup]
-
-Warn[This syntax is still in development. New features coming soon!]
-
--- Pricing
-
-Pricing[
-{Free;$0/mo;Personal use, 1 project, Community support}
-{Pro;$19/mo;Commercial use, Unlimited projects, Priority support}
-{Enterprise;$99/mo;Multi-users, API access, Dedicated support}
-]
-
-quote[Simplicity is the ultimate sophistication. - Leonardo da Vinci]
-`;
-
-interface BlockAppProps {
+interface DocAppProps {
   initialContent?: string;
   onBack: () => void;
 }
 
-export function BlockApp({ initialContent, onBack }: BlockAppProps) {
-  const [content, setContent] = useState(initialContent || DEFAULT_CONTENT);
+export function DocApp({ initialContent, onBack }: DocAppProps) {
+  const [content, setContent] = useState(initialContent || getDefaultDocContent());
   const [viewMode, setViewMode] = useState<'split' | 'editor' | 'preview'>('split');
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const charCount = getCharCount(content);
   
-  // Extract document title and theme from content
-  const documentTitle = useMemo(() => {
-    const match = content.match(/^---\s*(.+)$/m);
-    return match ? match[1].trim() : '';
-  }, [content]);
-  
-  const currentTheme = useMemo(() => {
-    const match = content.match(/^Theme\[(.+)\]$/im);
-    return (match ? match[1].trim() : 'Modern') as ThemeName;
-  }, [content]);
-  
-  const handleThemeChange = useCallback((theme: ThemeName) => {
-    // Check if Theme[] already exists
-    if (content.match(/^Theme\[.+\]$/im)) {
-      setContent(content.replace(/^Theme\[.+\]$/im, `Theme[${theme}]`));
-    } else {
-      // Add Theme after the title line
-      const lines = content.split('\n');
-      const titleIndex = lines.findIndex(line => line.match(/^---\s*.+$/));
-      if (titleIndex >= 0) {
-        lines.splice(titleIndex + 1, 0, `Theme[${theme}]`);
-        setContent(lines.join('\n'));
-      } else {
-        setContent(`Theme[${theme}]\n${content}`);
-      }
+  // Parse document
+  const doc = useMemo(() => {
+    try {
+      return parseDocDocument(content);
+    } catch (e) {
+      return null;
     }
   }, [content]);
+  
+  const documentTitle = doc?.title || 'Document';
 
   // Editor action handlers
   const handleInsert = useCallback((text: string) => {
@@ -155,12 +64,66 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
     }
   }, []);
 
-  const handleExport = () => {
-    downloadHtml(content, `${documentTitle || 'netral-site'}.html`);
+  const handleExportPDF = async () => {
     toast({
-      title: 'Export successful',
-      description: 'The HTML file has been downloaded.',
+      title: 'Export PDF',
+      description: 'Préparation du document...',
     });
+    
+    // Use browser print functionality for PDF export
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'ouvrir la fenêtre d\'impression. Vérifiez les popups.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Get the rendered content
+    const previewElement = previewRef.current;
+    if (!previewElement) return;
+    
+    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map(el => el.outerHTML)
+      .join('\n');
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${documentTitle}</title>
+          <meta charset="utf-8">
+          ${styles}
+          <style>
+            @page {
+              margin: 2cm;
+              size: A4;
+            }
+            body {
+              font-family: 'Inter', system-ui, sans-serif;
+              line-height: 1.6;
+              color: #1a1a1a;
+              background: white;
+            }
+            @media print {
+              body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          ${previewElement.innerHTML}
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
   };
   
   const handleLoadFile = (newContent: string) => {
@@ -180,9 +143,9 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
             e.preventDefault();
             handleWrap('*', '*');
             break;
-          case 's':
+          case 'p':
             e.preventDefault();
-            handleExport();
+            handleExportPDF();
             break;
         }
       }
@@ -200,24 +163,23 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
           <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <Layers className="h-5 w-5 text-primary" />
-          <span className="font-semibold text-foreground">Netral Block</span>
+          <FileText className="h-5 w-5 text-emerald-500" />
+          <span className="font-semibold text-foreground">Netral Doc</span>
           <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">
             {charCount} chars
           </span>
+          
           <FileMenu 
             documentTitle={documentTitle} 
             content={content} 
             onLoad={handleLoadFile}
-            fileExtension=".netblock"
+            fileExtension=".netdoc"
           />
-          <TemplatesModal mode="block" onSelect={handleLoadFile} />
-          <ThemeSelector currentTheme={currentTheme} onThemeChange={handleThemeChange} />
         </div>
 
         <div className="flex items-center gap-2">
           {/* Help */}
-          <HelpModal mode="block" />
+          <HelpModal mode="doc" />
           
           {/* View mode toggle */}
           <div className="flex items-center bg-muted rounded-md p-0.5">
@@ -232,7 +194,7 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
                   <Code2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Editor only</TooltipContent>
+              <TooltipContent>Éditeur seul</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -246,7 +208,7 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
                   <PanelLeft className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Split view</TooltipContent>
+              <TooltipContent>Vue partagée</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -260,14 +222,19 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Preview only</TooltipContent>
+              <TooltipContent>Aperçu seul</TooltipContent>
             </Tooltip>
           </div>
 
-          {/* Export */}
-          <Button variant="default" size="sm" onClick={handleExport} className="gap-2">
+          {/* Export PDF */}
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={handleExportPDF} 
+            className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
             <Download className="h-4 w-4" />
-            Export
+            Export PDF
           </Button>
         </div>
       </header>
@@ -278,25 +245,25 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="relative h-full border-r border-border" ref={editorContainerRef}>
-                <Editor value={content} onChange={setContent} mode="block" />
-                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="block" />
+                <Editor value={content} onChange={setContent} mode="doc" />
+                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="doc" />
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="h-full overflow-auto">
-                <NetralRenderer content={content} />
+              <div ref={previewRef} className="h-full overflow-auto bg-white">
+                <DocRenderer content={content} />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : viewMode === 'editor' ? (
           <div className="relative h-full" ref={editorContainerRef}>
-            <Editor value={content} onChange={setContent} mode="block" />
-            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="block" />
+            <Editor value={content} onChange={setContent} mode="doc" />
+            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="doc" />
           </div>
         ) : (
-          <div className="h-full overflow-auto">
-            <NetralRenderer content={content} />
+          <div ref={previewRef} className="h-full overflow-auto bg-white">
+            <DocRenderer content={content} />
           </div>
         )}
       </div>
@@ -304,4 +271,4 @@ export function BlockApp({ initialContent, onBack }: BlockAppProps) {
   );
 }
 
-export default BlockApp;
+export default DocApp;

@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface HelpModalProps {
-  mode?: 'block' | 'deck';
+  mode?: 'block' | 'deck' | 'doc';
 }
 
 const blockSyntaxReference = [
@@ -148,11 +148,66 @@ const deckSyntaxReference = [
   },
 ];
 
+const docSyntaxReference = [
+  {
+    category: 'Structure du Document',
+    icon: '📄',
+    items: [
+      { name: 'Titre', syntax: '--- Mon Document', description: 'Définit le titre du document' },
+      { name: 'Theme', syntax: 'Theme[Modern]', description: 'Thèmes: Modern, Natural, Latte, Dark Mode, Terminal, Ocean, Solarized, Midnight, Minimal' },
+      { name: 'Section', syntax: '--- Section Title', description: 'Crée une section principale' },
+      { name: 'Sous-section', syntax: '-- Sub Section', description: 'Crée une sous-section' },
+    ],
+  },
+  {
+    category: 'Titres',
+    icon: '📝',
+    items: [
+      { name: 'Titre H1', syntax: '# Titre niveau 1', description: 'Titre principal' },
+      { name: 'Titre H2', syntax: '## Titre niveau 2', description: 'Sous-titre' },
+      { name: 'Titre H3', syntax: '### Titre niveau 3', description: 'Titre tertiaire' },
+    ],
+  },
+  {
+    category: 'Formatage',
+    icon: '✨',
+    items: [
+      { name: 'Gras', syntax: '**texte en gras**', description: 'Met le texte en gras' },
+      { name: 'Italique', syntax: '*texte en italique*', description: 'Met le texte en italique' },
+      { name: 'Code inline', syntax: '`code`', description: 'Code dans le texte' },
+      { name: 'Lien', syntax: '[texte](https://url.com)', description: 'Lien hypertexte' },
+    ],
+  },
+  {
+    category: 'Listes',
+    icon: '📋',
+    items: [
+      { name: 'Liste à puces', syntax: '- Premier\n- Deuxième', description: 'Liste non ordonnée' },
+      { name: 'Liste numérotée', syntax: '1. Premier\n2. Deuxième', description: 'Liste ordonnée' },
+      { name: 'Checkbox', syntax: '- [ ] À faire\n- [x] Fait', description: 'Liste de tâches' },
+    ],
+  },
+  {
+    category: 'Blocs',
+    icon: '🧩',
+    items: [
+      { name: 'Citation', syntax: '> Citation importante', description: 'Bloc de citation' },
+      { name: 'Code', syntax: '```\ncode\n```', description: 'Bloc de code' },
+      { name: 'Image', syntax: '![desc](url)', description: 'Image avec description' },
+      { name: 'Table', syntax: '| Col1 | Col2 |\n|------|------|\n| Val1 | Val2 |', description: 'Tableau' },
+      { name: 'Séparateur', syntax: '---', description: 'Ligne de séparation' },
+    ],
+  },
+];
+
 export function HelpModal({ mode = 'block' }: HelpModalProps) {
   const isBlock = mode === 'block';
-  const syntaxReference = isBlock ? blockSyntaxReference : deckSyntaxReference;
-  const title = isBlock ? 'Netral Block Guide' : 'Netral Deck Guide';
-  const Icon = isBlock ? Sparkles : Presentation;
+  const isDeck = mode === 'deck';
+  const isDoc = mode === 'doc';
+  
+  const syntaxReference = isDoc ? docSyntaxReference : (isDeck ? deckSyntaxReference : blockSyntaxReference);
+  const title = isDoc ? 'Netral Doc Guide' : (isDeck ? 'Netral Deck Guide' : 'Netral Block Guide');
+  const Icon = isDoc ? FileText : (isDeck ? Presentation : Sparkles);
   
   return (
     <Dialog>

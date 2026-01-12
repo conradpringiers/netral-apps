@@ -7,6 +7,7 @@ import { useState, useCallback, useRef } from 'react';
 import { Launcher, NetralMode } from './launcher/Launcher';
 import { BlockApp } from './block/BlockApp';
 import { DeckApp } from './deck/DeckApp';
+import { DocApp } from './doc/DocApp';
 
 export function NetralApp() {
   const [mode, setMode] = useState<NetralMode>(null);
@@ -35,6 +36,8 @@ export function NetralApp() {
         
         if (file.name.endsWith('.netdeck')) {
           setMode('deck');
+        } else if (file.name.endsWith('.netdoc')) {
+          setMode('doc');
         } else if (file.name.endsWith('.netblock')) {
           setMode('block');
         }
@@ -54,6 +57,10 @@ export function NetralApp() {
 
   if (mode === 'deck') {
     return <DeckApp initialContent={initialContent} onBack={handleBack} />;
+  }
+
+  if (mode === 'doc') {
+    return <DocApp initialContent={initialContent} onBack={handleBack} />;
   }
 
   // Show launcher

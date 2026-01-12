@@ -23,7 +23,7 @@ import {
 interface FloatingToolbarProps {
   onInsert: (text: string) => void;
   onWrap: (prefix: string, suffix: string) => void;
-  mode?: 'block' | 'deck';
+  mode?: 'block' | 'deck' | 'doc';
 }
 
 interface ToolbarButton {
