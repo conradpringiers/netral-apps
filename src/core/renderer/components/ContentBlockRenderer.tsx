@@ -465,6 +465,88 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
         </div>
       );
 
+    case 'badge':
+      return (
+        <span 
+          className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold"
+          style={{ 
+            backgroundColor: 'hsl(var(--primary))',
+            color: 'hsl(var(--primary-foreground))'
+          }}
+        >
+          {block.text}
+        </span>
+      );
+
+    case 'progress':
+      return (
+        <div className="my-4 max-w-3xl mx-auto">
+          <div className="flex justify-between items-center mb-2">
+            {block.label && (
+              <span className="text-sm" style={{ color: 'hsl(var(--foreground))' }}>{block.label}</span>
+            )}
+            <span className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{block.value}%</span>
+          </div>
+          <div 
+            className="w-full h-3 rounded-full overflow-hidden"
+            style={{ backgroundColor: 'hsl(var(--muted))' }}
+          >
+            <div 
+              className="h-full rounded-full transition-all duration-500"
+              style={{ 
+                width: `${block.value}%`,
+                backgroundColor: 'hsl(var(--primary))'
+              }}
+            />
+          </div>
+        </div>
+      );
+
+    case 'card':
+      return (
+        <div className="flex flex-wrap justify-center gap-6 my-8">
+          {block.items.map((item, index) => (
+            <div
+              key={index}
+              className="card-hover rounded-xl overflow-hidden shadow-md border w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
+              style={{ 
+                backgroundColor: 'hsl(var(--card))',
+                borderColor: 'hsl(var(--border))'
+              }}
+            >
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div className="p-5">
+                <h3 
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: 'hsl(var(--card-foreground))' }}
+                >
+                  {item.title}
+                </h3>
+                <p style={{ color: 'hsl(var(--muted-foreground))' }} className="text-sm">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+
+    case 'accordion':
+      return (
+        <div className="my-8 space-y-4 max-w-3xl mx-auto">
+          {block.items.map((item, index) => (
+            <AccordionItem key={index} title={item.title} content={item.content} />
+          ))}
+        </div>
+      );
+
     default:
       return null;
   }
@@ -493,6 +575,35 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
       {isOpen && (
         <div className="p-4" style={{ backgroundColor: 'hsl(var(--card))' }}>
           <p style={{ color: 'hsl(var(--muted-foreground))' }}>{answer}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Accordion Item with toggle behavior
+function AccordionItem({ title, content }: { title: string; content: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div 
+      className="border rounded-xl overflow-hidden"
+      style={{ borderColor: 'hsl(var(--border))' }}
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 text-left transition-colors"
+        style={{ backgroundColor: isOpen ? 'hsl(var(--secondary))' : 'hsl(var(--card))' }}
+      >
+        <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>{title}</span>
+        <ChevronDown 
+          className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          style={{ color: 'hsl(var(--muted-foreground))' }}
+        />
+      </button>
+      {isOpen && (
+        <div className="p-4" style={{ backgroundColor: 'hsl(var(--card))' }}>
+          <p style={{ color: 'hsl(var(--muted-foreground))' }}>{content}</p>
         </div>
       )}
     </div>

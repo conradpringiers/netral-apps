@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph' | 'comparison' | 'agenda';
   content: string;
   props?: Record<string, any>;
 }
@@ -125,6 +125,8 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'gallery', pattern: /Gallery\[([\s\S]*?)\]/g },
     { type: 'progress', pattern: /Progress\[([^\]]+)\]/g },
     { type: 'graph', pattern: /Graph\[([\s\S]*?)\]/g },
+    { type: 'comparison', pattern: /Comparison\[([\s\S]*?)\]/g },
+    { type: 'agenda', pattern: /Agenda\[([\s\S]*?)\]/g },
   ];
   
   // Handle Column separately with balanced bracket matching
@@ -187,6 +189,10 @@ function parseSlideContent(content: string): SlideContent[] {
         matchData.props = parseProgressContent(match[1]);
       } else if (type === 'graph') {
         matchData.props = { nodes: parseGraphNodes(match[1]) };
+      } else if (type === 'comparison') {
+        matchData.props = { items: parseComparisonItems(match[1]) };
+      } else if (type === 'agenda') {
+        matchData.props = { items: parseAgendaItems(match[1]) };
       }
 
       matches.push(matchData);
@@ -379,6 +385,32 @@ function parseGraphNodes(content: string): { id: string; label: string; connecti
     });
   }
   return nodes;
+}
+
+function parseComparisonItems(content: string): { title: string; items: string[] }[] {
+  const results: { title: string; items: string[] }[] = [];
+  // Format: {Title;item1;item2;...}
+  const matches = content.matchAll(/\{([^;]+);([^}]+)\}/g);
+  for (const match of matches) {
+    const title = match[1].trim();
+    const items = match[2].split(';').map(s => s.trim());
+    results.push({ title, items });
+  }
+  return results;
+}
+
+function parseAgendaItems(content: string): { number: string; title: string; duration: string }[] {
+  const items: { number: string; title: string; duration: string }[] = [];
+  // Format: {number;title;duration}
+  const matches = content.matchAll(/\{([^;]+);([^;]+);([^}]+)\}/g);
+  for (const match of matches) {
+    items.push({
+      number: match[1].trim(),
+      title: match[2].trim(),
+      duration: match[3].trim(),
+    });
+  }
+  return items;
 }
 
 /**
