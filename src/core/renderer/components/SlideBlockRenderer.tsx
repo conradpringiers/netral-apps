@@ -14,28 +14,28 @@ interface SlideBlockRendererProps {
 export function SlideBlockRenderer({ block, scale = 'fullscreen' }: SlideBlockRendererProps) {
   const isPreview = scale === 'preview';
   
-  // Scale factors for preview vs fullscreen
+  // Scale factors for preview vs fullscreen - BIGGER text sizes
   const sizes = {
-    text: isPreview ? 'text-xs' : 'text-lg',
-    textLg: isPreview ? 'text-sm' : 'text-xl',
-    textXl: isPreview ? 'text-base' : 'text-2xl',
-    text2xl: isPreview ? 'text-lg' : 'text-3xl',
-    text3xl: isPreview ? 'text-xl' : 'text-4xl',
-    text4xl: isPreview ? 'text-2xl' : 'text-5xl',
-    heading1: isPreview ? 'text-base' : 'text-3xl',
-    heading2: isPreview ? 'text-sm' : 'text-2xl',
-    heading3: isPreview ? 'text-xs' : 'text-xl',
-    icon: isPreview ? 'text-xl' : 'text-3xl',
-    iconLg: isPreview ? 'text-2xl' : 'text-4xl',
-    gap: isPreview ? 'gap-2' : 'gap-8',
-    gapSm: isPreview ? 'gap-1' : 'gap-4',
-    padding: isPreview ? 'p-2' : 'p-6',
-    paddingSm: isPreview ? 'p-1' : 'p-3',
-    paddingLg: isPreview ? 'p-2' : 'p-8',
-    space: isPreview ? 'space-y-1' : 'space-y-4',
+    text: isPreview ? 'text-sm' : 'text-2xl',
+    textLg: isPreview ? 'text-base' : 'text-3xl',
+    textXl: isPreview ? 'text-lg' : 'text-4xl',
+    text2xl: isPreview ? 'text-xl' : 'text-5xl',
+    text3xl: isPreview ? 'text-2xl' : 'text-6xl',
+    text4xl: isPreview ? 'text-3xl' : 'text-7xl',
+    heading1: isPreview ? 'text-lg' : 'text-5xl',
+    heading2: isPreview ? 'text-base' : 'text-4xl',
+    heading3: isPreview ? 'text-sm' : 'text-3xl',
+    icon: isPreview ? 'text-2xl' : 'text-5xl',
+    iconLg: isPreview ? 'text-3xl' : 'text-6xl',
+    gap: isPreview ? 'gap-2' : 'gap-10',
+    gapSm: isPreview ? 'gap-1' : 'gap-6',
+    padding: isPreview ? 'p-2' : 'p-8',
+    paddingSm: isPreview ? 'p-1' : 'p-4',
+    paddingLg: isPreview ? 'p-3' : 'p-10',
+    space: isPreview ? 'space-y-2' : 'space-y-6',
     maxH: isPreview ? 'max-h-24' : 'max-h-[60vh]',
-    rounded: isPreview ? 'rounded' : 'rounded-lg',
-    roundedLg: isPreview ? 'rounded-md' : 'rounded-xl',
+    rounded: isPreview ? 'rounded' : 'rounded-xl',
+    roundedLg: isPreview ? 'rounded-md' : 'rounded-2xl',
   };
 
   switch (block.type) {

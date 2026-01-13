@@ -7,7 +7,6 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Editor, getEditorMethods } from '@/components/Editor';
 import { DeckPreview } from '@/core/renderer/DeckPreview';
 import { PresentationMode } from '@/core/renderer/PresentationMode';
-import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
 import { TemplatesModal } from '@/shared/components/TemplatesModal';
@@ -240,7 +239,6 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="relative h-full border-r border-border" ref={editorContainerRef}>
                 <Editor value={content} onChange={setContent} mode="deck" />
-                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
@@ -251,7 +249,6 @@ export function DeckApp({ initialContent, onBack }: DeckAppProps) {
         ) : viewMode === 'editor' ? (
           <div className="relative h-full" ref={editorContainerRef}>
             <Editor value={content} onChange={setContent} mode="deck" />
-            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="deck" />
           </div>
         ) : (
           <DeckPreview content={content} />
