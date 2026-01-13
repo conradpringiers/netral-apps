@@ -57,9 +57,9 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
         .netral-render * {
           border-color: hsl(var(--border));
         }
-        .netral-render .prose-content h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: hsl(var(--foreground)); }
-        .netral-render .prose-content h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.75rem; color: hsl(var(--foreground)); }
-        .netral-render .prose-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: hsl(var(--foreground)); }
+        .netral-render .prose-content h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: hsl(var(--foreground)); font-family: var(--heading-font-family); }
+        .netral-render .prose-content h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.75rem; color: hsl(var(--foreground)); font-family: var(--heading-font-family); }
+        .netral-render .prose-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: hsl(var(--foreground)); font-family: var(--heading-font-family); }
         .netral-render .prose-content p { margin-bottom: 1rem; color: hsl(var(--foreground)); line-height: 1.7; }
         .netral-render .prose-content a { color: hsl(var(--primary)); text-decoration: underline; transition: opacity 0.2s; }
         .netral-render .prose-content a:hover { opacity: 0.8; }
@@ -240,7 +240,8 @@ export function NetralRenderer({ content, className = '' }: NetralRendererProps)
             {section.title && (
               <h2 className="text-2xl sm:text-3xl font-bold mb-8 pb-2 border-b text-center sm:text-left" style={{ 
                 color: 'hsl(var(--foreground))',
-                borderColor: 'hsl(var(--border))'
+                borderColor: 'hsl(var(--border))',
+                fontFamily: theme.headingFontFamily,
               }}>
                 {section.title}
               </h2>

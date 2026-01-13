@@ -61,7 +61,7 @@ export function DocRenderer({ content, className = '' }: DocRendererProps) {
           <header className="mb-12 border-b-2 border-[hsl(var(--primary))] pb-6">
             <h1 
               className="text-4xl font-bold text-[hsl(var(--foreground))]"
-              style={{ fontFamily: theme.fontFamily }}
+              style={{ fontFamily: theme.headingFontFamily }}
             >
               {doc.title}
             </h1>
@@ -73,11 +73,17 @@ export function DocRenderer({ content, className = '' }: DocRendererProps) {
           <section key={index} className="mb-10">
             {section.title && (
               section.level === 1 ? (
-                <h2 className="mb-4 text-2xl font-bold text-[hsl(var(--foreground))] border-b border-[hsl(var(--border))] pb-2">
+                <h2 
+                  className="mb-4 text-2xl font-bold text-[hsl(var(--foreground))] border-b border-[hsl(var(--border))] pb-2"
+                  style={{ fontFamily: theme.headingFontFamily }}
+                >
                   {section.title}
                 </h2>
               ) : (
-                <h3 className="mb-3 text-xl font-semibold text-[hsl(var(--foreground))]">
+                <h3 
+                  className="mb-3 text-xl font-semibold text-[hsl(var(--foreground))]"
+                  style={{ fontFamily: theme.headingFontFamily }}
+                >
                   {section.title}
                 </h3>
               )
@@ -102,6 +108,7 @@ export function DocRenderer({ content, className = '' }: DocRendererProps) {
           color: hsl(${theme.colors.foreground});
           margin-top: 1.5em;
           margin-bottom: 0.5em;
+          font-family: ${theme.headingFontFamily};
         }
         .doc-content h1 { font-size: 2rem; font-weight: 700; }
         .doc-content h2 { font-size: 1.5rem; font-weight: 600; }

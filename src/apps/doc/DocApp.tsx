@@ -6,7 +6,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Editor, getEditorMethods } from '@/components/Editor';
 import { DocRenderer } from '@/core/renderer/DocRenderer';
-import { FloatingToolbar } from '@/shared/components/FloatingToolbar';
 import { HelpModal } from '@/shared/components/HelpModal';
 import { FileMenu } from '@/shared/components/FileMenu';
 import { getCharCount } from '@/core/renderer/markdownRenderer';
@@ -246,7 +245,6 @@ export function DocApp({ initialContent, onBack }: DocAppProps) {
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="relative h-full border-r border-border" ref={editorContainerRef}>
                 <Editor value={content} onChange={setContent} mode="doc" />
-                <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="doc" />
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
@@ -259,7 +257,6 @@ export function DocApp({ initialContent, onBack }: DocAppProps) {
         ) : viewMode === 'editor' ? (
           <div className="relative h-full" ref={editorContainerRef}>
             <Editor value={content} onChange={setContent} mode="doc" />
-            <FloatingToolbar onInsert={handleInsert} onWrap={handleWrap} mode="doc" />
           </div>
         ) : (
           <div ref={previewRef} className="h-full overflow-auto bg-white">

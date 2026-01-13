@@ -195,10 +195,13 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
       {isIntroSlide ? (
         <div className="fullscreen-slide relative h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center justify-center">
           <DeckLogo logo={doc.logo} />
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-center text-[hsl(var(--primary))] px-8">
+          <h1 
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-center text-[hsl(var(--primary))] px-8"
+            style={{ fontFamily: theme.headingFontFamily }}
+          >
             {doc.title}
           </h1>
-          <p className="text-xl text-[hsl(var(--muted-foreground))] mt-6">
+          <p className="text-2xl text-[hsl(var(--muted-foreground))] mt-6">
             {doc.slides.length} slides
           </p>
         </div>
@@ -207,7 +210,10 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
           <DeckLogo logo={doc.logo} />
           {/* Slide title with separator */}
           <div className="w-full max-w-7xl px-12 pt-10 pb-6">
-            <h1 className="text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))]">
+            <h1 
+              className="text-4xl md:text-5xl font-bold text-[hsl(var(--foreground))]"
+              style={{ fontFamily: theme.headingFontFamily }}
+            >
               {slide.title}
             </h1>
             <hr className="mt-4 border-t border-[hsl(var(--border))]" />

@@ -69,6 +69,23 @@ const blockSnippets: Record<string, string> = {
 {https://picsum.photos/400/300?2;Image 2}
 {https://picsum.photos/400/300?3;Image 3}
 ]`,
+  'Timeline': `Timeline[
+{2024;Step 1;Description of the step}
+{2025;Step 2;Description of the step}
+]`,
+  'Team': `Team[
+{John Doe;CEO;https://i.pravatar.cc/150?img=1}
+{Jane Smith;CTO;https://i.pravatar.cc/150?img=2}
+]`,
+  'Accordion': `Accordion[
+{Question 1;Answer to question 1}
+{Question 2;Answer to question 2}
+]`,
+  'Badge': `Badge[New Feature]`,
+  'Progress': `Progress[75;Loading...]`,
+  'Card': `Card[
+{Title;Description;https://picsum.photos/400/300}
+]`,
 };
 
 // Deck mode snippets (presentations)
@@ -77,6 +94,7 @@ const deckSnippets: Record<string, string> = {
   'Feature': `Feature[
 {🚀;Title;Description}
 {⚡;Title;Description}
+{🎯;Title;Description}
 ]`,
   'Column': `Column[
 {
@@ -91,6 +109,7 @@ Contenu droite
   'Stats': `Stats[
 {100+;Métrique}
 {50K;Valeur}
+{99%;Score}
 ]`,
   'Image': `Image[https://example.com/image.jpg]`,
   'Warn': `Warn[Message d'avertissement]`,
@@ -100,21 +119,24 @@ Contenu droite
   'Timeline': `Timeline[
 {2024;Étape 1;Description de l'étape}
 {2025;Étape 2;Description de l'étape}
+{2026;Étape 3;Description de l'étape}
 ]`,
   'List': `List[
 {✓;Premier élément}
 {✓;Deuxième élément}
+{✓;Troisième élément}
 ]`,
   'Video': `Video[https://example.com/video.mp4]`,
-  'Code': `Code[
-\`\`\`js
-console.log('Hello');
-\`\`\`
+  'Code': `Code[javascript;
+function hello() {
+  console.log('Hello World!');
+}
 ]`,
   'Badge': `Badge[Nouveau]`,
   'Gallery': `Gallery[
 {https://picsum.photos/400/300?1;Image 1}
 {https://picsum.photos/400/300?2;Image 2}
+{https://picsum.photos/400/300?3;Image 3}
 ]`,
   'Progress': `Progress[75;Progression]`,
   'Graph': `Graph[
@@ -122,6 +144,15 @@ console.log('Hello');
 {step1;Étape 1;->step2}
 {step2;Étape 2;->end}
 {end;Fin;}
+]`,
+  'Comparison': `Comparison[
+{Avant;❌ Problème 1;❌ Problème 2}
+{Après;✅ Solution 1;✅ Solution 2}
+]`,
+  'Agenda': `Agenda[
+{1;Introduction;5 min}
+{2;Développement;15 min}
+{3;Conclusion;5 min}
 ]`,
 };
 
@@ -132,8 +163,11 @@ const docSnippets: Record<string, string> = {
   'h1': `# Titre principal`,
   'h2': `## Sous-titre`,
   'h3': `### Titre niveau 3`,
+  'h4': `#### Titre niveau 4`,
   'bold': `**texte en gras**`,
   'italic': `*texte en italique*`,
+  'strike': `~~texte barré~~`,
+  'highlight': `==texte surligné==`,
   'list': `- Premier élément
 - Deuxième élément
 - Troisième élément`,
@@ -141,20 +175,30 @@ const docSnippets: Record<string, string> = {
 2. Deuxième élément
 3. Troisième élément`,
   'quote': `> Citation importante`,
-  'code': `\`\`\`
-code ici
+  'code': `\`\`\`javascript
+// Votre code ici
 \`\`\``,
   'inline': `\`code inline\``,
   'link': `[texte du lien](https://url.com)`,
   'image': `![description](https://url.com/image.jpg)`,
-  'table': `| Colonne 1 | Colonne 2 |
-|-----------|-----------|
-| Valeur 1  | Valeur 2  |`,
+  'table': `| Colonne 1 | Colonne 2 | Colonne 3 |
+|-----------|-----------|-----------|
+| Valeur 1  | Valeur 2  | Valeur 3  |
+| Valeur A  | Valeur B  | Valeur C  |`,
   'divider': `---`,
   'checkbox': `- [ ] Tâche à faire
 - [x] Tâche terminée`,
-  'note': `> **Note:** Information importante`,
+  'note': `> **📝 Note:** Information importante`,
   'warn': `> **⚠️ Attention:** Message d'avertissement`,
+  'success': `> **✅ Succès:** Opération réussie`,
+  'info': `> **ℹ️ Info:** Information utile`,
+  'definition': `**Terme**
+: Définition du terme`,
+  'footnote': `Texte avec note[^1]
+
+[^1]: Contenu de la note de bas de page`,
+  'abbr': `*[HTML]: HyperText Markup Language`,
+  'toc': `[[toc]]`,
 };
 
 // Get snippets based on mode
