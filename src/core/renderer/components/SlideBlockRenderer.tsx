@@ -260,6 +260,52 @@ export function SlideBlockRenderer({ block, scale = 'fullscreen' }: SlideBlockRe
         </div>
       );
 
+    case 'comparison':
+      const comparisonItems = block.props?.items || [];
+      return (
+        <div className={`grid grid-cols-2 ${sizes.gap} py-4`}>
+          {comparisonItems.map((item: { title: string; items: string[] }, idx: number) => (
+            <div 
+              key={idx} 
+              className={`${sizes.padding} ${sizes.rounded} border border-[hsl(var(--border))]`}
+              style={{ backgroundColor: idx === 0 ? 'hsl(var(--muted))' : 'hsl(var(--primary)/0.1)' }}
+            >
+              <h3 className={`font-bold ${sizes.textXl} mb-4 text-center text-[hsl(var(--foreground))]`}>{item.title}</h3>
+              <ul className={sizes.space}>
+                {item.items.map((text, i) => (
+                  <li key={i} className={`${sizes.text} text-[hsl(var(--foreground))] flex items-start gap-2`}>
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      );
+
+    case 'agenda':
+      const agendaItems = block.props?.items || [];
+      return (
+        <div className={`${sizes.space} py-4`}>
+          {agendaItems.map((item: { number: string; title: string; duration: string }, idx: number) => (
+            <div 
+              key={idx} 
+              className={`flex items-center ${sizes.gapSm} ${sizes.paddingSm} ${sizes.rounded} bg-[hsl(var(--muted))]`}
+            >
+              <div className={`flex-shrink-0 ${isPreview ? 'w-8 h-8 text-sm' : 'w-12 h-12 text-xl'} rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] flex items-center justify-center font-bold`}>
+                {item.number}
+              </div>
+              <div className="flex-1">
+                <h4 className={`font-semibold ${sizes.textLg} text-[hsl(var(--foreground))]`}>{item.title}</h4>
+              </div>
+              <div className={`${sizes.text} text-[hsl(var(--muted-foreground))] flex-shrink-0`}>
+                {item.duration}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+
     default:
       return null;
   }

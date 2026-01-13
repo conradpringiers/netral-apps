@@ -54,7 +54,22 @@ export type ContentBlock =
   | { type: 'gallery'; items: GalleryItem[] }
   | { type: 'timeline'; items: TimelineItem[] }
   | { type: 'team'; items: TeamMember[] }
-  | { type: 'countdown'; label: string; date: string; description: string };
+  | { type: 'countdown'; label: string; date: string; description: string }
+  | { type: 'badge'; text: string }
+  | { type: 'progress'; value: number; label: string }
+  | { type: 'card'; items: CardItem[] }
+  | { type: 'accordion'; items: AccordionItem[] };
+
+export interface CardItem {
+  title: string;
+  description: string;
+  image: string;
+}
+
+export interface AccordionItem {
+  title: string;
+  content: string;
+}
 
 export interface ElementItem {
   title: string;
@@ -405,6 +420,48 @@ export function parseNetralDocument(input: string): NetralDocument {
         continue;
       }
 
+      // Badge[text]
+      const badgeMatch = trimmed.match(/^Badge\[([^\]]+)\]/i);
+      if (badgeMatch) {
+        flushMarkdown();
+        currentSection.content.push({ type: 'badge', text: badgeMatch[1].trim() });
+        i++;
+        continue;
+      }
+
+      // Progress[value;label]
+      const progressMatch = trimmed.match(/^Progress\[([^\]]+)\]/i);
+      if (progressMatch) {
+        flushMarkdown();
+        const parts = progressMatch[1].split(';').map(s => s.trim());
+        const value = parseInt(parts[0], 10) || 0;
+        currentSection.content.push({
+          type: 'progress',
+          value: Math.min(100, Math.max(0, value)),
+          label: parts[1] || '',
+        });
+        i++;
+        continue;
+      }
+
+      // Card[...]
+      if (trimmed.startsWith('Card[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'card', items: parseCardItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
+      // Accordion[...]
+      if (trimmed.startsWith('Accordion[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        currentSection.content.push({ type: 'accordion', items: parseAccordionItems(content) });
+        i = endIndex + 1;
+        continue;
+      }
+
       // Regular markdown content
       markdownBuffer += line + '\n';
     }
@@ -670,6 +727,43 @@ function parseTeamItems(content: string): TeamMember[] {
       role: match[2].trim(),
       photo: match[3].trim(),
       bio: match[4].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse card items: {Title;Description;Image}
+ */
+function parseCardItems(content: string): CardItem[] {
+  const items: CardItem[] = [];
+  const regex = /\{([^;]*);([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      title: match[1].trim(),
+      description: match[2].trim(),
+      image: match[3].trim(),
+    });
+  }
+  
+  return items;
+}
+
+/**
+ * Parse accordion items: {Title;Content}
+ */
+function parseAccordionItems(content: string): AccordionItem[] {
+  const items: AccordionItem[] = [];
+  const regex = /\{([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = regex.exec(content)) !== null) {
+    items.push({
+      title: match[1].trim(),
+      content: match[2].trim(),
     });
   }
   
