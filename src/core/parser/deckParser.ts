@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph' | 'comparison' | 'agenda' | 'background';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph' | 'comparison' | 'agenda' | 'background' | 'speaker';
   content: string;
   props?: Record<string, any>;
 }
@@ -136,6 +136,7 @@ function parseSlideContent(content: string): SlideContent[] {
     { type: 'graph', pattern: /Graph\[([\s\S]*?)\]/g },
     { type: 'comparison', pattern: /Comparison\[([\s\S]*?)\]/g },
     { type: 'agenda', pattern: /Agenda\[([\s\S]*?)\]/g },
+    { type: 'speaker', pattern: /Speaker\[([^\]]+)\]/g },
   ];
   
   // Handle Column separately with balanced bracket matching
@@ -202,6 +203,14 @@ function parseSlideContent(content: string): SlideContent[] {
         matchData.props = { items: parseComparisonItems(match[1]) };
       } else if (type === 'agenda') {
         matchData.props = { items: parseAgendaItems(match[1]) };
+      } else if (type === 'speaker') {
+        const parts = match[1].split(';').map((s: string) => s.trim());
+        matchData.props = {
+          quote: parts[0] || '',
+          name: parts[1] || '',
+          role: parts[2] || '',
+          photo: parts[3] || '',
+        };
       }
 
       matches.push(matchData);

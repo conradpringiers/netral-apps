@@ -10,6 +10,12 @@ export interface DocSection {
   title: string;
   level: 1 | 2; // 1 for ---, 2 for --
   content: string;
+  callouts: DocCallout[];
+}
+
+export interface DocCallout {
+  type: 'info' | 'warning' | 'success' | 'error';
+  message: string;
 }
 
 export interface DocDocument {
@@ -33,7 +39,9 @@ export function parseDocDocument(input: string): DocDocument {
   
   const flushSection = () => {
     if (currentSection) {
-      currentSection.content = contentBuffer.join('\n').trim();
+      const { processedContent, callouts } = processCallouts(contentBuffer.join('\n').trim());
+      currentSection.content = processedContent;
+      currentSection.callouts = callouts;
       sections.push(currentSection);
       contentBuffer = [];
     }
@@ -64,6 +72,7 @@ export function parseDocDocument(input: string): DocDocument {
         title: mainSectionMatch[1].trim(),
         level: 1,
         content: '',
+        callouts: [],
       };
       continue;
     }
@@ -76,6 +85,7 @@ export function parseDocDocument(input: string): DocDocument {
         title: subSectionMatch[1].trim(),
         level: 2,
         content: '',
+        callouts: [],
       };
       continue;
     }
@@ -89,10 +99,12 @@ export function parseDocDocument(input: string): DocDocument {
   
   // If no sections but content exists, create a default section
   if (sections.length === 0 && contentBuffer.length > 0) {
+    const { processedContent, callouts } = processCallouts(contentBuffer.join('\n').trim());
     sections.push({
       title: '',
       level: 1,
-      content: contentBuffer.join('\n').trim(),
+      content: processedContent,
+      callouts,
     });
   }
   
@@ -110,6 +122,30 @@ export function renderDocContent(markdown: string): string {
     ADD_TAGS: ['iframe'],
     ADD_ATTR: ['target', 'rel', 'loading', 'class'],
   });
+}
+
+/**
+ * Process callouts from content and return remaining content + callouts
+ */
+function processCallouts(content: string): { processedContent: string; callouts: DocCallout[] } {
+  const callouts: DocCallout[] = [];
+  
+  // Match Callout[type;message] pattern
+  const calloutRegex = /Callout\[(info|warning|success|error);([^\]]+)\]/gi;
+  let processedContent = content;
+  let match;
+  
+  while ((match = calloutRegex.exec(content)) !== null) {
+    callouts.push({
+      type: match[1].toLowerCase() as DocCallout['type'],
+      message: match[2].trim(),
+    });
+  }
+  
+  // Remove callout blocks from content
+  processedContent = processedContent.replace(calloutRegex, '').trim();
+  
+  return { processedContent, callouts };
 }
 
 /**

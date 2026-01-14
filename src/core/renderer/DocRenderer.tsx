@@ -4,12 +4,52 @@
  */
 
 import { useMemo } from 'react';
-import { parseDocDocument, renderDocContent } from '@/core/parser/docParser';
+import { parseDocDocument, renderDocContent, DocCallout } from '@/core/parser/docParser';
 import { getTheme, generateThemeCSS, ThemeName } from '@/core/themes/themes';
 
 interface DocRendererProps {
   content: string;
   className?: string;
+}
+
+function getCalloutStyles(type: DocCallout['type']) {
+  switch (type) {
+    case 'info':
+      return {
+        bg: 'hsl(210 100% 95%)',
+        border: 'hsl(210 100% 50%)',
+        text: 'hsl(210 100% 30%)',
+        icon: 'ℹ️',
+      };
+    case 'warning':
+      return {
+        bg: 'hsl(45 100% 94%)',
+        border: 'hsl(45 100% 50%)',
+        text: 'hsl(45 100% 25%)',
+        icon: '⚠️',
+      };
+    case 'success':
+      return {
+        bg: 'hsl(142 70% 94%)',
+        border: 'hsl(142 70% 45%)',
+        text: 'hsl(142 70% 25%)',
+        icon: '✅',
+      };
+    case 'error':
+      return {
+        bg: 'hsl(0 84% 95%)',
+        border: 'hsl(0 84% 50%)',
+        text: 'hsl(0 84% 30%)',
+        icon: '❌',
+      };
+    default:
+      return {
+        bg: 'hsl(var(--muted))',
+        border: 'hsl(var(--border))',
+        text: 'hsl(var(--foreground))',
+        icon: '📝',
+      };
+  }
 }
 
 export function DocRenderer({ content, className = '' }: DocRendererProps) {
@@ -87,6 +127,28 @@ export function DocRenderer({ content, className = '' }: DocRendererProps) {
                   {section.title}
                 </h3>
               )
+            )}
+            
+            {/* Callouts */}
+            {section.callouts && section.callouts.length > 0 && (
+              <div className="space-y-3 mb-4">
+                {section.callouts.map((callout, idx) => {
+                  const styles = getCalloutStyles(callout.type);
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 p-4 rounded-lg border-l-4"
+                      style={{
+                        backgroundColor: styles.bg,
+                        borderLeftColor: styles.border,
+                      }}
+                    >
+                      <span className="text-lg">{styles.icon}</span>
+                      <p style={{ color: styles.text, margin: 0 }}>{callout.message}</p>
+                    </div>
+                  );
+                })}
+              </div>
             )}
             
             {section.content && (
