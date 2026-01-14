@@ -322,6 +322,34 @@ export function SlideBlockRenderer({ block, scale = 'fullscreen' }: SlideBlockRe
         </div>
       );
 
+    case 'speaker':
+      const speakerData = block.props || {};
+      return (
+        <div className={`flex flex-col items-center ${sizes.gap} py-6`}>
+          {speakerData.photo && (
+            <img
+              src={speakerData.photo}
+              alt={speakerData.name || 'Speaker'}
+              className={`${isPreview ? 'w-16 h-16' : 'w-24 h-24'} rounded-full object-cover border-4 shadow-lg`}
+              style={{ borderColor: 'hsl(var(--primary))' }}
+            />
+          )}
+          <blockquote className={`${sizes.textLg} italic text-center max-w-2xl leading-relaxed`} style={{ color: 'hsl(var(--foreground))' }}>
+            "{speakerData.quote}"
+          </blockquote>
+          <div className="text-center">
+            <p className={`font-bold ${sizes.text}`} style={{ color: 'hsl(var(--foreground))' }}>
+              {speakerData.name}
+            </p>
+            {speakerData.role && (
+              <p className={`${isPreview ? 'text-xs' : 'text-base'}`} style={{ color: 'hsl(var(--muted-foreground))' }}>
+                {speakerData.role}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+
     default:
       return null;
   }

@@ -89,6 +89,15 @@ const blockSnippets: Record<string, string> = {
 ]`,
   'Badge': `Badge[New Feature]`,
   'Progress': `Progress[75;Loading...]`,
+  'Showcase': `Showcase[
+https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600;
+Premium Headphones;
+Experience crystal-clear audio with our flagship model
+{Battery;40h}
+{Driver;50mm}
+{Noise Cancelling;Active}
+{Connectivity;Bluetooth 5.0}
+]`,
 };
 
 // Deck mode snippets (presentations)
@@ -158,6 +167,7 @@ function hello() {
 {3;Conclusion;5 min}
 ]`,
   'Background': `Background[https://images.unsplash.com/photo-1557683316-973673baf926?w=1920]`,
+  'Speaker': `Speaker[La simplicité est la sophistication ultime;Leonardo da Vinci;Artiste & Inventeur;https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Leonardo_da_Vinci%2C_Head_of_a_Woman.jpg/440px-Leonardo_da_Vinci%2C_Head_of_a_Woman.jpg]`,
 };
 
 // Doc mode snippets (documents)
@@ -203,6 +213,10 @@ const docSnippets: Record<string, string> = {
 [^1]: Contenu de la note de bas de page`,
   'abbr': `*[HTML]: HyperText Markup Language`,
   'toc': `[[toc]]`,
+  'Callout': `Callout[info;Ceci est une information importante à retenir.]`,
+  'Calloutw': `Callout[warning;Attention: cette action est irréversible!]`,
+  'Callouts': `Callout[success;Opération réussie avec succès!]`,
+  'Calloute': `Callout[error;Une erreur s'est produite lors du traitement.]`,
 };
 
 // Get snippets based on mode

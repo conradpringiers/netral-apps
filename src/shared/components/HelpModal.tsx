@@ -56,6 +56,7 @@ const blockSyntaxReference = [
       { name: 'Team', syntax: 'Team[{Name;Role;Photo;Bio}]', description: 'Team member profiles' },
       { name: 'Steps', syntax: 'Steps[{1;Title;Description}]', description: 'Numbered step process' },
       { name: 'Metric', syntax: 'Metric[{📈;Value;Label;+15%}]', description: 'KPI metrics with change' },
+      { name: 'Showcase', syntax: 'Showcase[URL;Title;Subtitle;{Spec;Value}]', description: 'Product showcase with specs' },
     ],
   },
   {
@@ -118,6 +119,7 @@ const deckSyntaxReference = [
       { name: 'Graph', syntax: 'Graph[{a;Start;->b}]', description: 'Flowchart' },
       { name: 'Comparison', syntax: 'Comparison[{Before;❌}{After;✅}]', description: 'Compare columns' },
       { name: 'Agenda', syntax: 'Agenda[{1;Topic;5min}]', description: 'Meeting agenda' },
+      { name: 'Speaker', syntax: 'Speaker[Quote;Name;Role;Photo]', description: 'Quote with speaker photo' },
     ],
   },
   {
@@ -180,6 +182,16 @@ const docSyntaxReference = [
       { name: 'Image', syntax: '![desc](url)', description: 'Image avec description' },
       { name: 'Table', syntax: '| Col1 | Col2 |\n|------|------|\n| Val1 | Val2 |', description: 'Tableau' },
       { name: 'Séparateur', syntax: '---', description: 'Ligne de séparation' },
+    ],
+  },
+  {
+    category: 'Callouts',
+    icon: '📌',
+    items: [
+      { name: 'Info', syntax: 'Callout[info;Message]', description: 'Bloc info bleu' },
+      { name: 'Warning', syntax: 'Callout[warning;Message]', description: 'Bloc avertissement jaune' },
+      { name: 'Success', syntax: 'Callout[success;Message]', description: 'Bloc succès vert' },
+      { name: 'Error', syntax: 'Callout[error;Message]', description: 'Bloc erreur rouge' },
     ],
   },
 ];

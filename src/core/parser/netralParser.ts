@@ -58,7 +58,8 @@ export type ContentBlock =
   | { type: 'badge'; text: string }
   | { type: 'progress'; value: number; label: string }
   | { type: 'steps'; items: StepItem[] }
-  | { type: 'metric'; items: MetricItem[] };
+  | { type: 'metric'; items: MetricItem[] }
+  | { type: 'showcase'; image: string; title: string; subtitle: string; specs: ShowcaseSpec[] };
 
 export interface StepItem {
   number: string;
@@ -71,6 +72,11 @@ export interface MetricItem {
   value: string;
   label: string;
   change: string;
+}
+
+export interface ShowcaseSpec {
+  label: string;
+  value: string;
 }
 
 export interface ElementItem {
@@ -464,6 +470,22 @@ export function parseNetralDocument(input: string): NetralDocument {
         continue;
       }
 
+      // Showcase[...]
+      if (trimmed.startsWith('Showcase[')) {
+        flushMarkdown();
+        const { content, endIndex } = extractBracketContent(lines, i);
+        const showcaseData = parseShowcaseContent(content);
+        currentSection.content.push({ 
+          type: 'showcase', 
+          image: showcaseData.image,
+          title: showcaseData.title,
+          subtitle: showcaseData.subtitle,
+          specs: showcaseData.specs
+        });
+        i = endIndex + 1;
+        continue;
+      }
+
       // Regular markdown content
       markdownBuffer += line + '\n';
     }
@@ -752,6 +774,31 @@ function parseStepsItems(content: string): StepItem[] {
   }
   
   return items;
+}
+
+/**
+ * Parse showcase content: Image;Title;Subtitle followed by {Spec;Value} items
+ */
+function parseShowcaseContent(content: string): { image: string; title: string; subtitle: string; specs: ShowcaseSpec[] } {
+  // Split by newlines or semicolons for the main parts
+  const parts = content.split(';').map(s => s.trim());
+  const image = parts[0] || '';
+  const title = parts[1] || '';
+  const subtitle = parts[2] || '';
+  
+  // Parse spec items {Label;Value}
+  const specs: ShowcaseSpec[] = [];
+  const specRegex = /\{([^;]*);([^}]*)\}/g;
+  let match;
+  
+  while ((match = specRegex.exec(content)) !== null) {
+    specs.push({
+      label: match[1].trim(),
+      value: match[2].trim(),
+    });
+  }
+  
+  return { image, title, subtitle, specs };
 }
 
 /**

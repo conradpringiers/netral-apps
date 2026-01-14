@@ -585,6 +585,62 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
         </div>
       );
 
+    case 'showcase':
+      return (
+        <div 
+          className="my-10 rounded-2xl overflow-hidden border shadow-xl max-w-4xl mx-auto"
+          style={{ 
+            backgroundColor: 'hsl(var(--card))',
+            borderColor: 'hsl(var(--border))'
+          }}
+        >
+          <div className="grid md:grid-cols-2">
+            {/* Image */}
+            <div className="relative aspect-square md:aspect-auto overflow-hidden">
+              <img
+                src={block.image}
+                alt={block.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div 
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.1) 0%, transparent 100%)' }}
+              />
+            </div>
+            {/* Content */}
+            <div className="p-6 md:p-8 flex flex-col justify-center">
+              <h3 
+                className="text-2xl md:text-3xl font-bold mb-2"
+                style={{ color: 'hsl(var(--foreground))' }}
+              >
+                {block.title}
+              </h3>
+              <p 
+                className="text-base mb-6"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
+              >
+                {block.subtitle}
+              </p>
+              {block.specs && block.specs.length > 0 && (
+                <div className="grid grid-cols-2 gap-4">
+                  {block.specs.map((spec, idx) => (
+                    <div key={idx} className="text-center p-3 rounded-lg" style={{ backgroundColor: 'hsl(var(--muted))' }}>
+                      <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                        {spec.label}
+                      </p>
+                      <p className="text-lg font-bold" style={{ color: 'hsl(var(--primary))' }}>
+                        {spec.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+
     default:
       return null;
   }
