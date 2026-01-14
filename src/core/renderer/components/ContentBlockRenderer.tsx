@@ -502,47 +502,85 @@ export function ContentBlockRenderer({ block }: ContentBlockRendererProps) {
         </div>
       );
 
-    case 'card':
+    case 'steps':
       return (
-        <div className="flex flex-wrap justify-center gap-6 my-8">
+        <div className="my-8 max-w-3xl mx-auto">
+          <div className="relative">
+            {/* Vertical line */}
+            <div 
+              className="absolute left-5 top-4 bottom-4 w-0.5"
+              style={{ backgroundColor: 'hsl(var(--border))' }}
+            />
+            {block.items.map((item, index) => (
+              <div key={index} className="flex gap-4 mb-6 last:mb-0">
+                <div 
+                  className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-md"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'hsl(var(--primary-foreground))'
+                  }}
+                >
+                  {item.number}
+                </div>
+                <div className="flex-1 pt-1">
+                  <h4 className="font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+                    {item.title}
+                  </h4>
+                  <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'metric':
+      return (
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 my-8">
           {block.items.map((item, index) => (
             <div
               key={index}
-              className="card-hover rounded-xl overflow-hidden shadow-md border w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] max-w-sm"
+              className="card-hover p-5 rounded-xl border w-[calc(50%-8px)] sm:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] max-w-xs"
               style={{ 
                 backgroundColor: 'hsl(var(--card))',
                 borderColor: 'hsl(var(--border))'
               }}
             >
-              {item.image && (
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                />
-              )}
-              <div className="p-5">
-                <h3 
-                  className="text-lg font-semibold mb-2"
-                  style={{ color: 'hsl(var(--card-foreground))' }}
+              <div className="text-3xl mb-3">{item.icon}</div>
+              <p 
+                className="text-2xl sm:text-3xl font-bold mb-1"
+                style={{ color: 'hsl(var(--foreground))' }}
+              >
+                {item.value}
+              </p>
+              <p 
+                className="text-sm mb-2"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
+              >
+                {item.label}
+              </p>
+              {item.change && (
+                <span 
+                  className="inline-block px-2 py-0.5 rounded text-xs font-medium"
+                  style={{ 
+                    backgroundColor: item.change.startsWith('+') || item.change.startsWith('↑') 
+                      ? 'hsl(var(--success) / 0.15)' 
+                      : item.change.startsWith('-') || item.change.startsWith('↓')
+                        ? 'hsl(142 71% 45% / 0.15)'
+                        : 'hsl(var(--muted))',
+                    color: item.change.startsWith('+') || item.change.startsWith('↑')
+                      ? 'hsl(var(--success))'
+                      : item.change.startsWith('-') || item.change.startsWith('↓')
+                        ? 'hsl(0 84% 60%)'
+                        : 'hsl(var(--muted-foreground))'
+                  }}
                 >
-                  {item.title}
-                </h3>
-                <p style={{ color: 'hsl(var(--muted-foreground))' }} className="text-sm">
-                  {item.description}
-                </p>
-              </div>
+                  {item.change}
+                </span>
+              )}
             </div>
-          ))}
-        </div>
-      );
-
-    case 'accordion':
-      return (
-        <div className="my-8 space-y-4 max-w-3xl mx-auto">
-          {block.items.map((item, index) => (
-            <AccordionItem key={index} title={item.title} content={item.content} />
           ))}
         </div>
       );
@@ -575,35 +613,6 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
       {isOpen && (
         <div className="p-4" style={{ backgroundColor: 'hsl(var(--card))' }}>
           <p style={{ color: 'hsl(var(--muted-foreground))' }}>{answer}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Accordion Item with toggle behavior
-function AccordionItem({ title, content }: { title: string; content: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <div 
-      className="border rounded-xl overflow-hidden"
-      style={{ borderColor: 'hsl(var(--border))' }}
-    >
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 text-left transition-colors"
-        style={{ backgroundColor: isOpen ? 'hsl(var(--secondary))' : 'hsl(var(--card))' }}
-      >
-        <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>{title}</span>
-        <ChevronDown 
-          className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          style={{ color: 'hsl(var(--muted-foreground))' }}
-        />
-      </button>
-      {isOpen && (
-        <div className="p-4" style={{ backgroundColor: 'hsl(var(--card))' }}>
-          <p style={{ color: 'hsl(var(--muted-foreground))' }}>{content}</p>
         </div>
       )}
     </div>

@@ -115,9 +115,9 @@ export const themes: Record<ThemeName, Theme> = {
       info: '25 65% 48%',
       success: '142 50% 45%',
     },
-    fontFamily: "'Source Sans 3', system-ui, sans-serif",
-    headingFontFamily: "'Merriweather', Georgia, serif",
-    borderRadius: '1rem',
+    fontFamily: "'EB Garamond', Georgia, serif",
+    headingFontFamily: "'Cinzel', 'Times New Roman', serif",
+    borderRadius: '0.25rem',
     style: 'light',
   },
   'Dark Mode': {
@@ -190,8 +190,8 @@ export const themes: Record<ThemeName, Theme> = {
       info: '200 85% 48%',
       success: '160 65% 42%',
     },
-    fontFamily: "'Nunito', system-ui, sans-serif",
-    headingFontFamily: "'Poppins', system-ui, sans-serif",
+    fontFamily: "'Crimson Text', Georgia, serif",
+    headingFontFamily: "'Inter', system-ui, sans-serif",
     borderRadius: '0.75rem',
     style: 'light',
   },
@@ -290,9 +290,9 @@ export const themes: Record<ThemeName, Theme> = {
       info: '20 90% 52%',
       success: '142 65% 42%',
     },
-    fontFamily: "'Quicksand', system-ui, sans-serif",
-    headingFontFamily: "'Archivo Black', Impact, sans-serif",
-    borderRadius: '1rem',
+    fontFamily: "'Lora', Georgia, serif",
+    headingFontFamily: "'Playfair Display', Georgia, serif",
+    borderRadius: '0.75rem',
     style: 'light',
   },
   'Neon': {
@@ -361,5 +361,5 @@ export function generateThemeCSS(theme: Theme): string {
  * Get Google Fonts import URL for all themes
  */
 export function getGoogleFontsUrl(): string {
-  return 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Audiowide&family=Bebas+Neue&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap';
+  return 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Audiowide&family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap';
 }

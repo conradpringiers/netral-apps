@@ -57,18 +57,20 @@ export type ContentBlock =
   | { type: 'countdown'; label: string; date: string; description: string }
   | { type: 'badge'; text: string }
   | { type: 'progress'; value: number; label: string }
-  | { type: 'card'; items: CardItem[] }
-  | { type: 'accordion'; items: AccordionItem[] };
+  | { type: 'steps'; items: StepItem[] }
+  | { type: 'metric'; items: MetricItem[] };
 
-export interface CardItem {
+export interface StepItem {
+  number: string;
   title: string;
   description: string;
-  image: string;
 }
 
-export interface AccordionItem {
-  title: string;
-  content: string;
+export interface MetricItem {
+  icon: string;
+  value: string;
+  label: string;
+  change: string;
 }
 
 export interface ElementItem {
@@ -444,20 +446,20 @@ export function parseNetralDocument(input: string): NetralDocument {
         continue;
       }
 
-      // Card[...]
-      if (trimmed.startsWith('Card[')) {
+      // Steps[...]
+      if (trimmed.startsWith('Steps[')) {
         flushMarkdown();
         const { content, endIndex } = extractBracketContent(lines, i);
-        currentSection.content.push({ type: 'card', items: parseCardItems(content) });
+        currentSection.content.push({ type: 'steps', items: parseStepsItems(content) });
         i = endIndex + 1;
         continue;
       }
 
-      // Accordion[...]
-      if (trimmed.startsWith('Accordion[')) {
+      // Metric[...]
+      if (trimmed.startsWith('Metric[')) {
         flushMarkdown();
         const { content, endIndex } = extractBracketContent(lines, i);
-        currentSection.content.push({ type: 'accordion', items: parseAccordionItems(content) });
+        currentSection.content.push({ type: 'metric', items: parseMetricItems(content) });
         i = endIndex + 1;
         continue;
       }
@@ -734,18 +736,18 @@ function parseTeamItems(content: string): TeamMember[] {
 }
 
 /**
- * Parse card items: {Title;Description;Image}
+ * Parse steps items: {Number;Title;Description}
  */
-function parseCardItems(content: string): CardItem[] {
-  const items: CardItem[] = [];
+function parseStepsItems(content: string): StepItem[] {
+  const items: StepItem[] = [];
   const regex = /\{([^;]*);([^;]*);([^}]*)\}/g;
   let match;
   
   while ((match = regex.exec(content)) !== null) {
     items.push({
-      title: match[1].trim(),
-      description: match[2].trim(),
-      image: match[3].trim(),
+      number: match[1].trim(),
+      title: match[2].trim(),
+      description: match[3].trim(),
     });
   }
   
@@ -753,17 +755,19 @@ function parseCardItems(content: string): CardItem[] {
 }
 
 /**
- * Parse accordion items: {Title;Content}
+ * Parse metric items: {Icon;Value;Label;Change}
  */
-function parseAccordionItems(content: string): AccordionItem[] {
-  const items: AccordionItem[] = [];
-  const regex = /\{([^;]*);([^}]*)\}/g;
+function parseMetricItems(content: string): MetricItem[] {
+  const items: MetricItem[] = [];
+  const regex = /\{([^;]*);([^;]*);([^;]*);([^}]*)\}/g;
   let match;
   
   while ((match = regex.exec(content)) !== null) {
     items.push({
-      title: match[1].trim(),
-      content: match[2].trim(),
+      icon: match[1].trim(),
+      value: match[2].trim(),
+      label: match[3].trim(),
+      change: match[4].trim(),
     });
   }
   

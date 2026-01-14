@@ -6,7 +6,7 @@
 import { ThemeName } from '../themes/themes';
 
 export interface SlideContent {
-  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph' | 'comparison' | 'agenda';
+  type: 'text' | 'markdown' | 'column' | 'feature' | 'image' | 'warn' | 'def' | 'quote' | 'stats' | 'bigtitle' | 'timeline' | 'list' | 'video' | 'code' | 'badge' | 'gallery' | 'progress' | 'graph' | 'comparison' | 'agenda' | 'background';
   content: string;
   props?: Record<string, any>;
 }
@@ -14,6 +14,7 @@ export interface SlideContent {
 export interface Slide {
   title: string;
   content: SlideContent[];
+  background?: string;
 }
 
 export interface DeckDocument {
@@ -82,7 +83,15 @@ export function parseDeckDocument(input: string): DeckDocument {
       currentSlide = {
         title: trimmedLine.replace(/^--\s*/, '').trim(),
         content: [],
+        background: undefined,
       };
+      continue;
+    }
+
+    // Background for current slide: Background[URL]
+    const bgMatch = trimmedLine.match(/^Background\[([^\]]+)\]$/i);
+    if (bgMatch && currentSlide) {
+      currentSlide.background = bgMatch[1].trim();
       continue;
     }
 

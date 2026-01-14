@@ -77,15 +77,18 @@ const blockSnippets: Record<string, string> = {
 {John Doe;CEO;https://i.pravatar.cc/150?img=1}
 {Jane Smith;CTO;https://i.pravatar.cc/150?img=2}
 ]`,
-  'Accordion': `Accordion[
-{Question 1;Answer to question 1}
-{Question 2;Answer to question 2}
+  'Steps': `Steps[
+{1;First Step;Description of what to do in this step}
+{2;Second Step;Continue with this action}
+{3;Third Step;Final step to complete}
+]`,
+  'Metric': `Metric[
+{📈;12.5K;Monthly Users;+15%}
+{💰;$48K;Revenue;+8%}
+{⭐;4.9;Rating;↑0.2}
 ]`,
   'Badge': `Badge[New Feature]`,
   'Progress': `Progress[75;Loading...]`,
-  'Card': `Card[
-{Title;Description;https://picsum.photos/400/300}
-]`,
 };
 
 // Deck mode snippets (presentations)
@@ -154,6 +157,7 @@ function hello() {
 {2;Développement;15 min}
 {3;Conclusion;5 min}
 ]`,
+  'Background': `Background[https://images.unsplash.com/photo-1557683316-973673baf926?w=1920]`,
 };
 
 // Doc mode snippets (documents)
