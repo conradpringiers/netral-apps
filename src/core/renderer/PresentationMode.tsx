@@ -207,9 +207,22 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
         </div>
       ) : slide ? (
         <div className="fullscreen-slide relative h-full w-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col items-center">
+          {/* Background image with overlay */}
+          {slide.background && (
+            <>
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${slide.background})` }}
+              />
+              <div 
+                className="absolute inset-0"
+                style={{ backgroundColor: `hsl(var(--background) / 0.80)` }}
+              />
+            </>
+          )}
           <DeckLogo logo={doc.logo} />
           {/* Slide title with separator */}
-          <div className="w-full max-w-7xl px-12 pt-10 pb-6">
+          <div className="relative w-full max-w-7xl px-12 pt-10 pb-6">
             <h1 
               className="text-4xl md:text-5xl font-bold text-[hsl(var(--foreground))]"
               style={{ fontFamily: theme.headingFontFamily }}
@@ -220,7 +233,7 @@ function FullscreenSlide({ content, currentSlide }: { content: string; currentSl
           </div>
           
           {/* Slide content */}
-          <div className="flex-1 w-full max-w-7xl px-12 pb-10 overflow-auto">
+          <div className="relative flex-1 w-full max-w-7xl px-12 pb-10 overflow-auto">
             <div className="w-full space-y-6">
               {slide.content.map((block, index) => (
                 <SlideBlockRenderer key={index} block={block} scale="fullscreen" />

@@ -286,23 +286,39 @@ export function SlideBlockRenderer({ block, scale = 'fullscreen' }: SlideBlockRe
     case 'agenda':
       const agendaItems = block.props?.items || [];
       return (
-        <div className={`${sizes.space} py-4`}>
-          {agendaItems.map((item: { number: string; title: string; duration: string }, idx: number) => (
-            <div 
-              key={idx} 
-              className={`flex items-center ${sizes.gapSm} ${sizes.paddingSm} ${sizes.rounded} bg-[hsl(var(--muted))]`}
-            >
-              <div className={`flex-shrink-0 ${isPreview ? 'w-8 h-8 text-sm' : 'w-12 h-12 text-xl'} rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] flex items-center justify-center font-bold`}>
-                {item.number}
+        <div className={`py-4`}>
+          <div className="grid grid-cols-1 gap-3">
+            {agendaItems.map((item: { number: string; title: string; duration: string }, idx: number) => (
+              <div 
+                key={idx} 
+                className={`flex items-center ${sizes.gapSm} relative overflow-hidden ${sizes.rounded}`}
+                style={{ 
+                  background: `linear-gradient(135deg, hsl(var(--primary)/0.15) 0%, hsl(var(--primary)/0.05) 100%)`,
+                  borderLeft: `4px solid hsl(var(--primary))`
+                }}
+              >
+                <div className={`${isPreview ? 'p-2' : 'p-4'} flex items-center ${sizes.gapSm} flex-1`}>
+                  <div 
+                    className={`flex-shrink-0 ${isPreview ? 'w-6 h-6 text-[10px]' : 'w-10 h-10 text-base'} rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] flex items-center justify-center font-bold shadow-md`}
+                  >
+                    {item.number}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`font-bold ${sizes.text} text-[hsl(var(--foreground))] truncate`}>{item.title}</h4>
+                  </div>
+                  <div 
+                    className={`flex-shrink-0 ${isPreview ? 'px-2 py-0.5 text-[8px]' : 'px-3 py-1 text-xs'} rounded-full font-medium`}
+                    style={{ 
+                      backgroundColor: 'hsl(var(--primary)/0.2)',
+                      color: 'hsl(var(--primary))'
+                    }}
+                  >
+                    ⏱ {item.duration}
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <h4 className={`font-semibold ${sizes.textLg} text-[hsl(var(--foreground))]`}>{item.title}</h4>
-              </div>
-              <div className={`${sizes.text} text-[hsl(var(--muted-foreground))] flex-shrink-0`}>
-                {item.duration}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
 

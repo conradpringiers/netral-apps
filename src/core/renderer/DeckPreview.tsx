@@ -100,9 +100,22 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
               } as React.CSSProperties}
             >
               <div className="deck-preview-slide relative h-full bg-[hsl(var(--background))] text-[hsl(var(--foreground))] flex flex-col">
+                {/* Background image with overlay */}
+                {slide.background && (
+                  <>
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${slide.background})` }}
+                    />
+                    <div 
+                      className="absolute inset-0"
+                      style={{ backgroundColor: `hsl(var(--background) / 0.85)` }}
+                    />
+                  </>
+                )}
                 <DeckLogo logo={doc.logo} />
                 {/* Slide title with separator */}
-                <div className="px-4 pt-3 pb-1">
+                <div className="relative px-4 pt-3 pb-1">
                   <h1 className="text-sm md:text-base font-bold text-[hsl(var(--foreground))]">
                     {slide.title}
                   </h1>
@@ -110,7 +123,7 @@ export function DeckPreview({ content, className = '' }: DeckPreviewProps) {
                 </div>
                 
                 {/* Slide content */}
-                <div className="flex-1 px-4 pb-3 overflow-hidden min-h-0">
+                <div className="relative flex-1 px-4 pb-3 overflow-hidden min-h-0">
                   <div className="w-full space-y-2">
                     {slide.content.map((block, blockIndex) => (
                       <SlideBlockRenderer key={blockIndex} block={block} scale="preview" />
